@@ -35,7 +35,7 @@
               <div class="form d-flex align-items-center">
                 <div class="content">
                   <form method="post"  action="{{url('login')}}" class="form-validate">
-                    @method('post')
+                    {{-- @method('post') --}}
                     @csrf
                     <div class="form-group">
                         <input type="email" name="email" class="form-control" id="exampleInputEmail" aria-describedby="emailHelp"

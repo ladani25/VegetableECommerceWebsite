@@ -43,6 +43,34 @@ class cartcontroller extends Controller
     // }
     
     
+    // public function cart()
+    // {
+    //     // Fetch the user
+    //     $user = User::where('email', session('email'))->first();
+    
+    //     if ($user) {
+    //         // Retrieve the user's ID
+    //         $user_id = $user->u_id;
+    
+    //         // Fetch cart items with product details and calculate total price for each item
+    //         $cartItems = DB::table('carts')
+    //             ->join('products', 'carts.p_id', '=', 'products.p_id')
+    //             ->where('carts.u_id', $user_id)
+    //             ->select('carts.*', 'products.*', DB::raw('carts.quantity * products.price as total_price'))
+    //             ->get();
+    
+    //         // Calculate total quantity and total price
+    //         $totalQuantity = $cartItems->sum('quantity');
+    //         $totalPrice = $cartItems->sum('total_price');
+    
+    //         // Pass the cart items, total quantity, and total price to the view
+    //         return view('home.cart', compact('cartItems', 'totalQuantity', 'totalPrice'));
+    //     } else {
+    //         // Handle the case where the user is not found
+    //         return redirect()->back()->with('error', 'User not found.');
+    //     }
+    // }
+    
     public function cart()
     {
         // Fetch the user
@@ -71,7 +99,6 @@ class cartcontroller extends Controller
         }
     }
     
-   
 
 
     
@@ -197,87 +224,89 @@ class cartcontroller extends Controller
         return redirect()->back()->with('success', 'All products removed from cart.');
     }
 
-    // public function updateCart(Request $request, $itemId)
-    // {
-    //     // Validate the incoming request data
-    //     $request->validate([
-    //         'quantity' => 'required|integer|min:1|max:10', // Adjust validation rules as needed
-    //     ]);
-    
-    //     // Find the cart item by ID
-    //     $cartItem =  cart::find($itemId);
-    
-    //     if ($cartItem) {
-    //         // Update the quantity
-    //         $cartItem->quantity = $request->input('quantity');
-    //         $cartItem->save();
-    
-    //         // Optionally, you can return a response indicating success
-    //         return redirect()->back()->with('success', 'Cart item updated successfully.');
-    //     } else {
-    //         // Handle the case where the cart item is not found
-    //         return redirect()->back()->with('error', 'Cart item not found.');
-    //     }
-    // }
 
-    // public function updateCart(Request $request, $itemId)
-    // {
-    //     // Validate the incoming request data
-    //     $validatedData = $request->validate([
-    //         'qty' => 'required|integer|min:1|max:10', // Adjust validation rules as needed
-    //     ]);
+// public function updateCart(Request $request, $itemId)
+// {
+//     // Validate the incoming request data
+//     $validatedData = $request->validate([
+//         'qty' => 'required|integer|min:1|max:10',
+//     ]);
 
-    //     // Find the cart item by ID
-    //     $cartItem = cart::find($itemId);
+//     // Find the cart item by ID
+//     $cartItem = cart::find($itemId);
 
-    //     if ($cartItem) {
-    //         // Update the quantity
-    //         $cartItem->quantity = $validatedData['qty']; // Use the validated quantity from the request
-    //         $cartItem->save();
+//     if ($cartItem) {
+//         // Update the quantity
+//         $cartItem->quantity = $validatedData['qty'];
+//         $cartItem->save();
 
-    //         // Optionally, you can return a response indicating success
-    //         return redirect()->back()->with('success', 'Cart item updated successfully.');
-    //     } else {
-    //         // Handle the case where the cart item is not found
-    //         return redirect()->back()->with('error', 'Cart item not found.');
-    //     }
-    // }
+//         // Recalculate total quantity and total price of all items in the cart for the user
+//         $user_id = $cartItem->user_id;
+//         $cartItems = cart::where('u_id', $user_id)->get();
+//         $totalQuantity = $cartItems->sum('quantity');
+//         $totalPrice = $cartItems->sum(function ($item) {
+//             return $item->quantity * $item->product->price;
+//         });
 
-    public function updateCart(Request $request, $itemId)
+//         // Return a response indicating success
+//         return redirect()->back()->with([
+//             'success' => 'Cart item updated successfully.',
+//             'totalQuantity' => $totalQuantity,
+//             'totalPrice' => $totalPrice,
+//         ]);
+//     } else {
+//         // Handle the case where the cart item is not found
+//         return redirect()->back()->with('error', 'Cart item not found.');
+//     }
+// }
+
+
+public function updateCart(Request $request, $itemId)
 {
     // Validate the incoming request data
     $validatedData = $request->validate([
-        'qty' => 'required|integer|min:1|max:10', // Adjust validation rules as needed
+        'qty' => 'required|integer|min:1|max:100',
     ]);
 
     // Find the cart item by ID
-    $cartItem = cart::find($itemId);
+    $cartItem = Cart::find($itemId);
 
     if ($cartItem) {
         // Update the quantity
-        $cartItem->quantity = $validatedData['qty']; // Use the validated quantity from the request
+        $cartItem->quantity = $validatedData['qty'];
         $cartItem->save();
 
-        // Recalculate total quantity and total price of all items in the cart
-        $cartItems = cart::all();
+        // Recalculate total quantity and total price of all items in the cart for the user
+        $user_id = $cartItem->u_id;
+        $cartItems = Cart::where('u_id', $user_id)->get();
         $totalQuantity = $cartItems->sum('quantity');
         $totalPrice = $cartItems->sum(function ($item) {
-            return $item->quantity * $item->price;
+            return $item->quantity * $item->product->price;
         });
 
-        // Optionally, you can return a response indicating success
-        return redirect()->back()->with([
-            'success' => 'Cart item updated successfully.',
+        $itemTotalPrice = $cartItem->quantity * $cartItem->product->price;
+
+        // Return a JSON response indicating success
+        return response()->json([
+            'success' => true,
+            'itemTotalPrice' => $itemTotalPrice,
             'totalQuantity' => $totalQuantity,
             'totalPrice' => $totalPrice,
         ]);
     } else {
         // Handle the case where the cart item is not found
-        return redirect()->back()->with('error', 'Cart item not found.');
+        return response()->json([
+            'success' => false,
+            'message' => 'Cart item not found.'
+        ]);
     }
 }
 
+
+
+
 }
+
 
 
 
