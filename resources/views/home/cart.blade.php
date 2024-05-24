@@ -62,8 +62,6 @@
                                 </form>
                             </td>
                         </tr>
-
-                        
                         @empty
                         <tr>
                             <td colspan="6">
@@ -89,17 +87,45 @@
                             <td></td>
                             <td>
                               <div class="cupon_text">
-                                <input type="text" placeholder="Coupon Code">
-                                <a class="main_btn" href="#">Apply</a>
-                                <a class="gray_btn" href="#">Close Coupon</a>
+                                <form action="{{ url('apply-coupon') }}" method="POST">
+                                    @csrf
+                                    <input type="text" placeholder="Coupon Code" name="coupon_code" id="coupon_code" class="form-control">
+                                    <button class="main_btn" type="submit">Apply</button>
+                                </form>
+                                <a class="gray_btn" href="{{ url('remove-coupon') }}">Close Coupon</a>
                               </div>
                             </td>
-                          </tr>
-
-                          
+                        </tr>
+                        <tr class="shipping_area">
+                            <td></td>
+                            <td></td>
+                            <td>
+                                <h5>Shipping</h5>
+                            </td>
+                            <td>
+                                <div class="shipping_box">
+                                    <ul class="list">
+                                        <li>
+                                            <a href="#">Flat Rate: $5.00</a>
+                                        </li>
+                                        <li>
+                                            <a href="#">Free Shipping</a>
+                                        </li>
+                                        <li>
+                                            <a href="#">Flat Rate: $10.00</a>
+                                        </li>
+                                        <li class="active">
+                                            <a href="#">Local Delivery: $2.00</a>
+                                        </li>
+                                    </ul>
+                                    <h6>
+                                        Calculate Shipping
+                                        <i class="fa fa-caret-down" aria-hidden="true"></i>
+                                    </h6>
+                                </div>
+                            </td>
+                        </tr>
                         @endif
-
-                        
                     </tbody>
                 </table>
             </div>

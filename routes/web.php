@@ -6,6 +6,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\productscontrollers;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\usercontrollers;
+use App\Http\Controllers\CouponController;
 use Illuminate\Support\Facades\Route;
 
 // Route::get('/', function () {
@@ -69,5 +70,13 @@ route::post('addcart',[cartcontroller::class,'addcart']);
 route::post('update-cart/{id}', [cartcontroller::class, 'updateCart']);
 route::post('removecart/{id}',[cartcontroller::class,'removecart']);
 route::post('removeall',[cartcontroller::class,'removeall']);
+
+
+// Route::post('apply-coupon', [CouponController::class, 'applyCoupon']);
+
+
+Route::resource('coupon', CouponController::class);
+Route::post('apply-coupon', [CouponController::class, 'applyCoupon'])->name('apply.coupon');
+Route::post('remove-coupon', [CouponController::class, 'removeCoupon'])->name('remove.coupon');
 
 
