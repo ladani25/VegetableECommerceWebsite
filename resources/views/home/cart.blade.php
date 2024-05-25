@@ -1,5 +1,18 @@
 @include('home.header')
 
+@if(session('error'))
+    <div class="alert alert-danger">
+        {{ session('error') }}
+    </div>
+@endif
+
+@if(session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+@endif
+
+
 <section class="cart_area section_gap">
     <div style="padding-left:70%">
         <form action="{{ url('removeall') }}" method="POST">
@@ -79,24 +92,92 @@
                                 </div>
                             </td>
                         </tr>
-                        <tr class="bottom_button">
+                        <tr>
                             <td>
-                              <a class="gray_btn" href="#">Update Cart</a>
-                            </td>
-                            <td></td>
-                            <td></td>
-                            <td>
-                              <div class="cupon_text">
-                                <form action="{{ url('apply-coupon') }}" method="POST">
-                                    @csrf
-                                    <input type="text" placeholder="Coupon Code" name="coupon_code" id="coupon_code" class="form-control">
-                                    <button class="main_btn" type="submit">Apply</button>
-                                </form>
-                                <a class="gray_btn" href="{{ url('remove-coupon') }}">Close Coupon</a>
-                              </div>
+                                <div class="cupon_text">
+                                    
+                                    <form action="{{ url('coupon') }}" method="POST">
+                                        @csrf
+                                        <h6>
+                                            <h5>Shipping</h5>
+                                            @php
+                                            $user_id = session('u_id');
+                                            $totalPrice = 0;
+                                            $discount = 0;
+                                            $shipping = 0;
+                                            $finalTotal =0;
+                                
+                                            if ($user_id) {
+                                                $totalPrice = \App\Models\Cart::where('u_id', $user_id)
+                                                    ->join('products', 'carts.p_id', '=', 'products.p_id')
+                                                    ->sum('products.price');
+                                
+                                                $coupon = session('coupon', ['discount' => 0, 'shipping' => 0]);
+                                                $discount = $coupon['discount'];
+                                                $shipping = $coupon['shipping'];
+                                                $finalTotal = $totalPrice - $discount + $shipping;
+                                            }
+                                            @endphp
+                                
+                                            <p>Total Price: ${{ $totalPrice }}</p>
+                                            <p>Discount: -${{ $discount }}</p>
+                                            <p>Shipping: ${{ $shipping }}</p>
+                                            <p><strong>Final Total: ${{ $finalTotal }}</strong></p>
+                                        </h6>
+                                        <input type="text" placeholder="Coupon Code" name="coupon_code" id="coupon_code" class="form-control">
+                                        <button class="main_btn" type="submit">Apply</button>
+                                    </form>
+                                    {{-- <a class="gray_btn" href="{{ url('remove-coupon') }}">Close Coupon</a> --}}
+                                </div>
+                                
+                                
+                                
                             </td>
                         </tr>
-                        <tr class="shipping_area">
+                        <tr class="bottom_button">
+                           
+                            
+                            <td>
+                                <div class="cupon_text">
+                                    <form action="{{ url('coupon') }}" method="POST">
+                                        @csrf
+                                        <h6>
+                                            <h5>Shipping</h5>
+    
+                                            @php
+                                            $user_id = session('u_id');
+                                            $totalPrice = 0;
+                                            $discount = 0;
+                                            $shipping = 0;
+                                            $finalTotal = 0;
+    
+                                            if ($user_id) {
+                                                $totalPrice = \App\Models\Cart::where('u_id', $user_id)->sum('price');
+                                                $coupon = session('coupon');
+                                                $discount = $coupon['discount'] ?? 0;
+                                                $shipping = $coupon['shipping'] ?? 0;
+                                                $finalTotal = $totalPrice - $discount + $shipping;
+                                            } else {
+                                                $totalPrice = 0;
+                                                $discount = 0;
+                                                $shipping = 0;
+                                                $finalTotal = 0;
+                                            }
+                                            @endphp
+    
+                                            <p>Total Price: ${{ $totalPrice }}</p>
+                                            <p>Discount: -${{ $discount }}</p>
+                                            <p>Shipping: ${{ $shipping }}</p>
+                                            <p><strong>Final Total: ${{ $finalTotal }}</strong></p>
+                                        </h6>
+                                        <input type="text" placeholder="Coupon Code" name="coupon_code" id="coupon_code" class="form-control">
+                                        <button class="main_btn" type="submit">Apply</button>
+                                    </form>
+                                    {{-- <a class="gray_btn" href="{{ url('remove-coupon') }}">Close Coupon</a> --}}
+                                </div>
+                            </td>
+                        </tr>
+                        {{-- <tr class="shipping_area">
                             <td></td>
                             <td></td>
                             <td>
@@ -104,27 +185,43 @@
                             </td>
                             <td>
                                 <div class="shipping_box">
-                                    <ul class="list">
-                                        <li>
-                                            <a href="#">Flat Rate: $5.00</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">Free Shipping</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">Flat Rate: $10.00</a>
-                                        </li>
-                                        <li class="active">
-                                            <a href="#">Local Delivery: $2.00</a>
-                                        </li>
-                                    </ul>
+                                    <form >
+                                        @csrf
+                                        <!-- Your shipping options and calculations -->
+                                    </form>
                                     <h6>
                                         Calculate Shipping
                                         <i class="fa fa-caret-down" aria-hidden="true"></i>
+
+                                        @php
+                                        $user_id = session('u_id');
+                                        $totalPrice = 0;
+                                        $discount = 0;
+                                        $shipping = 0;
+                                        $finalTotal = 0;
+
+                                        if ($user_id) {
+                                            $totalPrice = \App\Models\Cart::where('u_id', $user_id)->sum('price');
+                                            $coupon = session('coupon');
+                                            $discount = $coupon['discount'] ?? 0;
+                                            $shipping = $coupon['shipping'] ?? 0;
+                                            $finalTotal = $totalPrice - $discount + $shipping;
+                                        } else {
+                                            $totalPrice = 0;
+                                            $discount = 0;
+                                            $shipping = 0;
+                                            $finalTotal = 0;
+                                        }
+                                        @endphp
+
+                                        <p>Total Price: ${{ $totalPrice }}</p>
+                                        <p>Discount: -${{ $discount }}</p>
+                                        <p>Shipping: ${{ $shipping }}</p>
+                                        <p><strong>Final Total: ${{ $finalTotal }}</strong></p>
                                     </h6>
                                 </div>
                             </td>
-                        </tr>
+                        </tr> --}}
                         @endif
                     </tbody>
                 </table>
@@ -132,6 +229,13 @@
         </div>
     </div>
 </section>
+
+{{-- <script>
+    // Your JavaScript functions
+</script>
+
+@include('home.footer') --}}
+
 
 <script>
     function increaseQty(itemId) {
@@ -179,6 +283,43 @@
         })
         .catch(error => console.error('Error:', error));
     }
+
+    function coupon() {
+        var couponCode = document.getElementById('coupon_code').value;
+
+        fetch(`{{ url('apply-coupon') }}/${couponCode}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+       
+</script>
+
+<script>
+  $(document).ready(function(){
+        $('.shipping select[name=shipping]').change(function(){
+            var value = $(this).val();
+            if(value == 'flat_rate'){
+                $('.flat_rate').show();
+            }else{
+                $('.flat_rate').hide();
+            }
+        });
+    });
+    
 </script>
 
 @include('home.footer')

@@ -75,8 +75,12 @@ route::post('removeall',[cartcontroller::class,'removeall']);
 // Route::post('apply-coupon', [CouponController::class, 'applyCoupon']);
 
 
-Route::resource('coupon', CouponController::class);
-Route::post('apply-coupon', [CouponController::class, 'applyCoupon'])->name('apply.coupon');
-Route::post('remove-coupon', [CouponController::class, 'removeCoupon'])->name('remove.coupon');
+// Route::resource('coupon', CouponController::class);
+// Route::post('apply-coupon', [CouponController::class, 'applyCoupon'])->name('apply.coupon');
+// Route::post('remove-coupon', [CouponController::class, 'removeCoupon'])->name('remove.coupon');
 
+// Route::post('/apply-shipping', [CouponController::class, 'applyShipping'])->name('apply.shipping');
+// Route::post('/apply-coupon', [CouponController::class, 'applyCoupon'])->name('apply.coupon');
+// Route::post('/remove-coupon', [CouponController::class, 'removeCoupon'])->name('remove.coupon');
 
+route::post('coupon',[CouponController::class ,'coupon']);

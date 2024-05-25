@@ -17,13 +17,13 @@ class Coupon extends Model
     ];
 
     public static function findByCode($code){
-        return self::where('code',$code)->first();
+        return self::where('coupon_code',$code)->first();
     }
     public function discount($total)
     {
         if ($this->type == 'percent') {
             return $total * ($this->amount / 100);
-        } elseif ($this->type == 'fixed') {
+        } elseif ($this->type == 'flate') {
             return $this->amount;
         } else {
             return 0;
