@@ -32,7 +32,7 @@ class productscontrollers extends Controller
         $product->images = $filename;
         $product->price = $request->price;
         $product->selling_price=$request->selling_price;
-        $product->quantity = $request->quantity;
+        $product->p_quantity = $request->p_quantity;
         $product->c_id = $request->c_id ;
         $product->description= $request->description;
     
@@ -115,7 +115,7 @@ public function edit_p(Request $request, $p_id)
     $product->images = $filename; // Use the initialized value
     $product->price = $request->price;
     $product->selling_price=$request->selling_price;
-    $product->quantity = $request->quantity;
+    $product->p_quantity = $request->p_quantity;
     $product->c_id = $request->c_id ;
     $product->description= $request->description;
 

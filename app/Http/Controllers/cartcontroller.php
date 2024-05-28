@@ -5,6 +5,8 @@ use App\Models\cart;
 use App\Models\product;
 use App\Models\wishlist;
 use App\Models\User;
+use Illuminate\Support\Facades\Session;
+use App\Models\Coupon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -128,5 +130,23 @@ public function updateCart(Request $request, $itemId)
         ]);
     }
 }
+
+
+// public function updateCart(Request $request, $id)
+// {
+//     $cart = Cart::find($id);
+//     if (!$cart) {
+//         return redirect()->back()->with('error', 'Cart item not found.');
+//     }
+
+//     $cart->quantity = $request->qty;
+//     $cart->total_price = $cart->quantity * $cart->product->price;
+//     $cart->save();
+
+//     return redirect()->back()->with('success', 'Cart updated successfully');
+// }
+
+
+
 
 }

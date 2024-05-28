@@ -72,7 +72,7 @@
                     </div>
                     <div class="form-group">
                         <label>Quantity</label>
-                        <input type="number" name="quantity" class="form-control" value="{{$product->quantity}}" placeholder="Enter quantity">
+                        <input type="number" name="p_quantity" class="form-control" value="{{$product->p_quantity}}" placeholder="Enter quantity">
                     </div>
                     <div class="form-group">
                         <label for="category">Category</label>
