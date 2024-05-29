@@ -7,6 +7,7 @@ use App\Http\Controllers\productscontrollers;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\usercontrollers;
 use App\Http\Controllers\CouponController;
+use App\Http\Controllers\ordercontroller;
 use Illuminate\Support\Facades\Route;
 
 // Route::get('/', function () {
@@ -68,20 +69,15 @@ Route::post('/update-wishlist', [WishlistController::class, 'updateWishlist']);
 route::get('cart',[cartcontroller::class,'cart']);
 route::post('addcart',[cartcontroller::class,'addcart']);
 route::post('update-cart/{id}', [cartcontroller::class, 'updateCart']);
-// route::post('update-cart/{id}', [cartcontroller::class, 'updateCart']);
 route::post('removecart/{id}',[cartcontroller::class,'removecart']);
 route::post('removeall',[cartcontroller::class,'removeall']);
 
 
-// Route::post('apply-coupon', [CouponController::class, 'applyCoupon']);
-
-
-
-
-
 Route::post('apply-coupon', [CouponController::class, 'Coupon']);
-// Route::post('update-cart/{id}', [CartController::class, 'updateCartQty'])->name('update.cart');
+Route::get('checkout',[CouponController::class,'checkout']);
+// Route::post('apply-coupon',[CouponController::class,'applyCoupon']);
 
 
-
-route::get('checkout',[CouponController::class,'checkout']);
+route::get('order',[ordercontroller::class,'order']);
+route::post('addorder',[ordercontroller::class,'addorder']);
+route::post('placeorder',[ordercontroller::class,'placeorder']);

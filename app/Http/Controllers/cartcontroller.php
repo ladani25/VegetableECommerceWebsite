@@ -131,22 +131,72 @@ public function updateCart(Request $request, $itemId)
     }
 }
 
-
-// public function updateCart(Request $request, $id)
+// public function updateCart(Request $request, $itemId)
 // {
-//     $cart = Cart::find($id);
-//     if (!$cart) {
-//         return redirect()->back()->with('error', 'Cart item not found.');
+//     dd($request->all());
+//     // Validate the incoming request data
+//     $validatedData = $request->validate([
+//         'qty' => 'required|integer|min:1|max:100',
+//         'coupon_code' => 'nullable|string', // Allow coupon code to be nullable
+//     ]);
+
+//     // Find the cart item by ID
+//     $cartItem = Cart::find($itemId);
+
+//     if ($cartItem) {
+//         // Update the quantity
+//         $cartItem->quantity = $validatedData['qty'];
+//         $cartItem->save();
+
+//         // Recalculate total quantity and total price of all items in the cart for the user
+//         $user_id = $cartItem->u_id;
+//         $cartItems = Cart::where('u_id', $user_id)->get();
+//         $totalQuantity = $cartItems->sum('quantity');
+//         $totalPrice = $cartItems->sum(function ($item) {
+//             return $item->quantity * $item->product->price;
+//         });
+
+//         // Apply coupon logic if a coupon code is provided
+//         $discount = 0;
+//         dd($discount);
+//         if ($validatedData['coupon_code']) {
+//             // Find the coupon
+//             $coupon = Coupon::where('coupon_code', $validatedData['coupon_code'])->first();
+
+//             if ($coupon) {
+//                 // Calculate discount based on coupon type and amount
+//                 $discount = $coupon->type == 'percent'
+//                     ? $totalPrice * ($coupon->amount / 100)
+//                     : $coupon->amount;
+//             } else {
+//                 return response()->json([
+//                     'success' => false,
+//                     'message' => 'Invalid coupon code.'
+//                 ]);
+//             }
+//         }
+
+//         // Recalculate total price after applying the coupon
+//         $totalPrice -= $discount;
+
+//         $itemTotalPrice = $cartItem->quantity * $cartItem->product->price;
+
+//         // Return a JSON response indicating success
+//         return response()->json([
+//             'success' => true,
+//             'itemTotalPrice' => $itemTotalPrice,
+//             'totalQuantity' => $totalQuantity,
+//             'totalPrice' => $totalPrice,
+//             'discount' => $discount, // Include discount information in the response
+//         ]);
+//     } else {
+//         // Handle the case where the cart item is not found
+//         return response()->json([
+//             'success' => false,
+//             'message' => 'Cart item not found.'
+//         ]);
 //     }
-
-//     $cart->quantity = $request->qty;
-//     $cart->total_price = $cart->quantity * $cart->product->price;
-//     $cart->save();
-
-//     return redirect()->back()->with('success', 'Cart updated successfully');
 // }
-
-
 
 
 }
