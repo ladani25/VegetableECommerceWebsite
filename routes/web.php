@@ -73,11 +73,20 @@ route::post('removecart/{id}',[cartcontroller::class,'removecart']);
 route::post('removeall',[cartcontroller::class,'removeall']);
 
 
-Route::post('apply-coupon', [CouponController::class, 'Coupon']);
-Route::get('checkout',[CouponController::class,'checkout']);
+// Route::post('apply-coupon', [CouponController::class, 'Coupon']);
+Route::post('apply-coupon', [CouponController::class, 'applyCoupon']);
+Route::post('checkout',[CouponController::class,'checkout']);
 // Route::post('apply-coupon',[CouponController::class,'applyCoupon']);
 
 
 route::get('order',[ordercontroller::class,'order']);
 route::post('addorder',[ordercontroller::class,'addorder']);
 route::post('placeorder',[ordercontroller::class,'placeorder']);
+route::post('order_details/{o_id}',[ordercontroller::class,'order_details']);
+Route::get('checkout',[CouponController::class,'checkout']);
+
+
+route::post('placeorder',[ordercontroller::class,'placeorder']);
+// Route::get('checkout',[ordercontroller::class,'checkout']);
+
+route::get('check_out',[CouponController::class,'check_out']);

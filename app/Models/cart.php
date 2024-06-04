@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class cart extends Model
 {
     use HasFactory;
-    public $timestamp = false;
+    public $timestamp = true;
     protected $table = "carts";
     protected $primaryKey = "id";
     protected $attributes = [
