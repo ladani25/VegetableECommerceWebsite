@@ -4,8 +4,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Coupon;
 use App\Models\Cart;
+use App\Models\order;
+use App\Models\User;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+
 
 class CouponController extends Controller
 {
@@ -80,73 +84,82 @@ public function applyCoupon(Request $request)
     return back()->with('success', 'Coupon applied successfully.');
 }
 
-// public function Coupon(Request $request)
-// {
-//     // dd($request->all());
-//     $request->validate([
-//         'coupon_code' => 'required|string',
-//     ]);
 
-//     $coupon = Coupon::where('coupon_code', $request->coupon_code)->first();
-//     // dd($coupon);
-//     if (!$coupon) {
-       
-//         Session::put('coupon', [
-//             'discount' => 0,
-//             'shipping' => 0
-//         ]);
-//         return redirect()->back()->with('error', 'Invalid coupon code.');
-//     }
 
-//     $userId = auth()->id();
-//     dd($userId);
-//     $cartItems = Cart::where('u_id', $userId)->get();
-//     // dd($cartItems);
-//     $totalPrice = $cartItems->sum('total_price');
-//     // dd($totalPrice);
-//     $discount = $coupon->type == 'percent'
-//         ? $totalPrice * ($coupon->amount / 100)
-//         : $coupon->amount;
 
-//     $shipping = 10; // Assuming a fixed shipping cost
+ public function checkout(Request $request) 
+{
+    // Fetch the user based on the session email
+    $user = User::where('email', session('email'))->first();
+    if (!$user) {
+        return  view('home.checkout')->with('error', 'User not found.');
+    }
 
-//     Session::put('coupon', [
-//         'discount' => $discount,
-//         'shipping' => $shipping
-//     ]);
+    // Retrieve the user ID from the session
+    $userId = session('u_id');
+    if (!$userId) {
+        return  view('home.checkout')->with('error', 'User ID not found in session.');
+    }
 
-//     // Recalculate total price after applying the coupon
-//     $totalPriceAfterCoupon = $totalPrice - $discount + $shipping;
+    // Fetch the cart items for the user
+    $cartItems = Cart::where('u_id', $userId)->get();
+    if ($cartItems->isEmpty()) {
+        return view('home.checkout')->with('error', 'Your cart is empty.');
+    }
 
-//     // Redirect back with success message and the recalculated total price
-//     return redirect()->back()->with('success', 'Coupon applied successfully.')->with('totalPriceAfterCoupon', $totalPriceAfterCoupon);
+    // Calculate the total price of the cart items
+    $totalPrice = $cartItems->sum('total_price');
+
+    // Retrieve coupon details from the session
+    $coupon = Session::get('coupon', [
+        'discount' => 0,
+        'shipping' => 0
+    ]);
+
+    $discount = $coupon['discount'];
+    $shipping = $coupon['shipping'];
+
+    // Calculate the final total price
+    $finalPrice = $totalPrice - $discount + $shipping;
+
+    // Create an order with the relevant details
+    try {
+        $order = Order::create([
+            'u_id' => $userId,
+            'amount' => $finalPrice, // Use the calculated final price
+            'qty' => $cartItems->sum('quantity'), // Sum of quantities in the cart
+        ]);
+    } catch (\Exception $e) {
+        // Log error or handle exception
+        return  view('home.checkout')->with('error', 'Failed to create order: ' . $e->getMessage());
+    }
+    $cartItems = Cart::where('u_id', $userId)->get();
+
+
+    // Insert order details and optionally clear the cart
+    foreach ($cartItems as $item) {
+        DB::table('order_details')->insert([
+            'order_id' => $order->id, // Ensure correct column for order ID
+            'product_id' => $item->product_id, // Add product_id
+            'qty' => $item->quantity,
+            'price' => $item->price,
+            'u_id' => $userId,
+        ]);
+    }
+
+    $item->delete(); 
+    return view('home.checkout', compact('cartItems', 'totalPrice', 'discount', 'shipping'));
+
+        // Optionally clear the cart item
+        // $item->delete(); // Use delete() instead of save() if clearing the cart
+    }
+
+    // Return the checkout view with the relevant details
+   // return view('home.checkout', compact('cartItems', 'totalPrice', 'discount', 'shipping'));
+//    return view('home.checkout', compact('cartItems', 'totalPrice', 'discount', 'shipping'));
 // }
 
 
-    public function checkout(Request $request) 
-    {
-        // dd($request->all());
-        $userId = auth()->id('u_id');
-        // dd($userId);
-        $cartItems = cart::where('u_id', $userId)->get();
-        // dd($cartItems);
-        $totalPrice = $cartItems->sum('total_price');
-        // dd($totalPrice);
-    
-        $coupon = Session::get('coupon', [
-            'discount' => 0,
-            'shipping' => 0
-        ]);
-
-
-        $discount = $coupon['discount'];
-        $shipping = $coupon['shipping'];
-        // dd($discount, $shipping);
-        // Calculate the final total price
-        $totalPrice = $totalPrice - $discount + $shipping;
-
-        return view('home.checkout', compact('cartItems', 'totalPrice', 'discount', 'shipping', 'totalPrice'));
-    }
 
 // public function updateCart(Request $request, $itemId)
 // {
@@ -214,42 +227,44 @@ public function applyCoupon(Request $request)
 //         ]);
 //     }
 // }
-// public function applyCoupon(Request $request)
+
+
+// public function checkout(Request $request) 
 // {
-//     $request->validate([
-//         'coupon_code' => 'required|string',
+//    $user = User::where('email', session('email'))->first();
+//     $userId = session('u_id');
+//     // dd($user);
+    
+//     if (!$userId) {
+//         // dd($userId);
+//         return view('home.checkout')->with('error', 'You need to be logged in to proceed to checkout.');
+//     }
+//     $cartItems = Cart::where('u_id', $userId)->get();
+
+//     if ($cartItems->isEmpty()) {
+//         return view('home.checkout')->with('error', 'Your cart is empty.');
+//     }
+
+   
+//     $totalPrice = $cartItems->sum(function ($item) {
+//         return $item->quantity * $item->product->price;
+//     });
+
+    
+//     $coupon = session('coupon', [
+//         'discount' => 0,
+//         'shipping' => 0
 //     ]);
 
-//     $couponCode = $request->input('coupon_code');
+//     $discount = $coupon['discount'];
+//     $shipping = $coupon['shipping'];
 
-//     $coupon = Coupon::where('coupon_code', $couponCode)->first();
+   
+//     $finalTotalPrice = $totalPrice - $discount + $shipping;
 
-//     if ($coupon) {
-//         // Store coupon details in session
-//         Session::put('coupon', [
-//             'discount' => $coupon->amount, // Assuming 'amount' represents the discount
-//             'shipping' => 10, // Assuming a fixed shipping cost
-//         ]);
-
-//         return response()->json([
-//             'success' => true,
-//             'coupon' => $coupon,
-//         ]);
-//     } else {
-//         return response()->json([
-//             'success' => false,
-//             'error' => 'Coupon not found',
-//         ]);
-//     }
+//     return view('home.checkout', compact('cartItems', 'totalPrice', 'discount', 'shipping', 'finalTotalPrice'));
 // }
 
-
-public function check_out(Request $request)
-{
-    dd($request->all());
-    return view('home.checkout');
-
-}
 
 
      

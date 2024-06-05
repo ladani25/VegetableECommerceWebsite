@@ -89,4 +89,7 @@ Route::get('checkout',[CouponController::class,'checkout']);
 route::post('placeorder',[ordercontroller::class,'placeorder']);
 // Route::get('checkout',[ordercontroller::class,'checkout']);
 
-route::get('check_out',[CouponController::class,'check_out']);
+// route::get('check_out',[CouponController::class,'check_out']);
+
+
+route::post(' orders',[ordercontroller::class,'orders']);

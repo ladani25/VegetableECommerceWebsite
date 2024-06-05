@@ -18,7 +18,7 @@
             <div class="row">
                 <div class="col-lg-8">
                     <h3>Billing Details</h3>
-                    <form class="row contact_form" action="{{ url('place-order') }}" method="POST" novalidate="novalidate">
+                    <form class="row contact_form" action="{{ url('order_deatils') }}" method="POST" novalidate="novalidate">
                         @csrf
                         <div class="col-md-6 form-group p_star">
                             <input type="text" class="form-control" id="first" name="first_name" placeholder="First Name" required>
@@ -64,16 +64,16 @@
                         <ul class="list">
                             <li><a href="#">Product <span>Total</span></a></li>
                             @foreach($cartItems as $item)
-                                <li><a href="#">{{ $item->product->name }} <span class="middle">x {{ $item->quantity }}</span> <span class="last">₹{{ $item->quantity * $item->product->price }}</span></a></li>
+                                <li><a href="#">{{ $item->product->name }} <span class="middle"> {{ $item->quantity }}</span> <span class="last">₹{{ $item->quantity * $item->product->price }}</span></a></li>
                             @endforeach
                         </ul>
                         <ul class="list list_2">
-                            <li><a href="#">Subtotal <span>₹{{ $totalPrice  }}</span></a></li>
-                            <li><a href="#">Discount <span>-₹{{ $discount }}</span></a></li>
-                            <li><a href="#">Shipping <span>₹{{ $shipping }}</span></a></li>
-                            <li><a href="#">Total <span  id="order_amount" >₹{{$totalPrice}}</span></a></li> 
+                            <li><a>Subtotal <span>₹{{  $totalPrice   }}</span></li>
+                            <li><a>Discount <span>-₹{{ $discount }}</span></li>
+                            <li><a>Shipping <span>₹{{ $shipping }}</span></li>
+                            <li><a>Total <span  id="order_amount" >₹{{$totalPrice}}</span></li> 
                             
-                            <li><a href="#">Payment <span>Paypal</span></a></li>
+                            <li>Payment <span>Paypal</span></li>
                         </ul>
                        
                         <div class="payment_item">
@@ -88,7 +88,7 @@
                             <div class="radion_btn">
                                 <input type="radio" id="f-option6" name="payment" value="paypal">
                                 <label for="f-option6">Paypal</label>
-                                <img src="img/product/single-product/card.jpg" alt="">
+                                <img src="{{ url('front-end/img/product/single-product/card.jpg')}}" alt="">
                                 <div class="check"></div>
                             </div>
                             <p>Pay via PayPal; you can pay with your credit card if you don’t have a PayPal account.</p>
@@ -104,32 +104,6 @@
 @include('home.footer')
 
 
-<script>
-  function checkout() {
-    const data = {
-        order_id: document.getElementById('order_id').value,
-        qty: document.getElementById('order_qty').value,
-        amount: document.getElementById('order_amount').value,
-        u_id: document.getElementById('user_id').value
-    };
 
-    fetch('/checkout', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        },
-        body: JSON.stringify(data)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('Order placed successfully! Order ID: ' + data.order_id);
-        } else {
-            alert('Failed to place order.');
-        }
-    })
-    .catch(error => console.error('Error:', error));
-}
 
-</script>
+

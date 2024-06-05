@@ -100,13 +100,14 @@
                                             <div id="couponDetails">
                                                 <input type="text" placeholder="Coupon Code" name="coupon_code" id='total-price-after-coupon''>
                                                 <div style="padding-top:0.5%">
-                                                    <button class="main_btn" type="submit">Apply</button>
+                                                    <button class="main_btn" type="submit" id=>Apply</button>
                                                 </div>
                                                 <p>Total Price: <span id="total-main-price">{{ $totalPrice }}</span></p>
-                                                <p>Discount: -₹<span id="displayDiscount">{{ session('coupon')['discount'] ?? 0 }}</span></p>
+                                                <p>Discount:-₹<span id="displayDiscount">{{ session('coupon')['discount'] }}</span></p>
                                                 <p>Shipping: ₹<span id="displayShipping">{{ session('coupon')['shipping'] ?? 0 }}</span></p>
-                                                <p>Total Price: <span id="total-main-price">{{ $totalPrice-  (session('coupon')['discount'] ?? 0) + (session('coupon')['shipping'] ?? 0) }}</span></strong></p>
-                                                <button class="main_btn" type="submit"><a href="{{ url('checkout') }}">Checkout</a></button>
+                                                <p>Total Price: <span id="total-pro-prices">{{ $totalPrice-  (session('coupon')['discount'] ?? 0) + (session('coupon')['shipping'] ?? 0) }}</span></strong></p>
+                                                {{-- <button class="main_btn"  type="submit"><a href="{{ url('checkout') }}">Checkout</a></button> --}}
+                                                <button type="submit" class="main_btn"><a href="{{ url('checkout') }}">Checkout</a></button>
                                             </div>
                                         </form>
                                     </div>
@@ -146,6 +147,8 @@
 
     function updateCartQty(itemId) {
         var qty = document.getElementById('sst-' + itemId).value;
+        var couponCode = document.getElementById('coupon_code') ? document.getElementById('coupon_code').value : null;
+        
 
         fetch(`{{ url('update-cart') }}/${itemId}`, {
             method: 'POST',
@@ -153,7 +156,7 @@
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
             },
-            body: JSON.stringify({ qty: qty })
+            body: JSON.stringify({ qty: qty, coupon_code: couponCode })
         })
         .then(response => response.json())
         .then(data => {
@@ -162,9 +165,9 @@
                 document.getElementById('totalQuantity').innerText = data.totalQuantity;
                 document.getElementById('totalPrice').innerText = '₹' + data.totalPrice;
                 document.getElementById('total-main-price').innerText = '₹' + data.totalPrice;
-                document.getElementById('displayDiscount').innerText = '₹' + data.discount;
+                // document.getElementById('displayDiscount').innerText = '₹' + data.discount;
                 // document.getElementById('displayShipping').innerText = '₹' + data.shipping;
-                // document.getElementById('displayFinalTotal').innerText = '₹' + data.finalTotal;
+                document.getElementById('total-pro-prices').innerText = '₹' + data.totalPrice;
             } else {
                 alert(data.message);
             }
@@ -172,26 +175,9 @@
         .catch(error => console.error('Error:', error));
     }
 
-    function applyCoupon() {
-        var couponCode = document.getElementById('coupon_code').value;
-        fetch(`{{ url('apply-coupon') }}/${couponCode}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({ couponCode: couponCode })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                document.getElementById('couponDetails').innerHTML = data.html;
-                document.getElementById('total-main-price').innerText = '₹' + data.finalTotal;
-            } else {
-                alert(data.message);
-            }
-        })    
-        .catch(error => console.error('Error:', error));
-    }  
+    
+
+
+
     
 </script>
