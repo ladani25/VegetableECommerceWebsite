@@ -289,7 +289,4 @@ public function updateCart(Request $request, $itemId)
         ]);
     }
 }
-
-
-
 }

@@ -95,21 +95,25 @@
                             <tr>
                                 <td colspan="6">
                                     <div class="cart_total">
-                                        <form action="{{ url('apply-coupon') }}" method="POST" class="#coupon_code">        
+                                        <form action="{{ url('apply-coupon') }}" method="POST" class="#coupon_code">
                                             @csrf
                                             <div id="couponDetails">
-                                                <input type="text" placeholder="Coupon Code" name="coupon_code" id='total-price-after-coupon''>
+                                                <input type="text" placeholder="Coupon Code" name="coupon_code" id='total-price-after-coupon'>
                                                 <div style="padding-top:0.5%">
-                                                    <button class="main_btn" type="submit" id=>Apply</button>
+                                                    <button class="main_btn" type="submit">Apply</button>
                                                 </div>
                                                 <p>Total Price: <span id="total-main-price">{{ $totalPrice }}</span></p>
-                                                <p>Discount:-₹<span id="displayDiscount">{{ session('coupon')['discount'] }}</span></p>
+                                                <p>Discount: -₹<span id="displayDiscount">{{ session('coupon')['discount'] ?? 0 }}</span></p>
                                                 <p>Shipping: ₹<span id="displayShipping">{{ session('coupon')['shipping'] ?? 0 }}</span></p>
-                                                <p>Total Price: <span id="total-pro-prices">{{ $totalPrice-  (session('coupon')['discount'] ?? 0) + (session('coupon')['shipping'] ?? 0) }}</span></strong></p>
-                                                {{-- <button class="main_btn"  type="submit"><a href="{{ url('checkout') }}">Checkout</a></button> --}}
-                                                <button type="submit" class="main_btn"><a href="{{ url('checkout') }}">Checkout</a></button>
+                                                <p>Total Price: <span id="total-pro-prices">{{ $totalPrice - (session('coupon')['discount'] ?? 0) + (session('coupon')['shipping'] ?? 0) }}</span></p>
+                                                <form action="{{url('order')}}" method="POST">
+                                                    @csrf
+                                                  
+                                                <button type="submit" name="submit" class="main_btn"><a href="{{ url('checkout') }}">Checkout</a></button>
+                                                </form>
                                             </div>
                                         </form>
+                                        
                                     </div>
                                 </td>
                             </tr>
@@ -173,11 +177,5 @@
             }
         })
         .catch(error => console.error('Error:', error));
-    }
-
-    
-
-
-
-    
+    }   
 </script>

@@ -56,7 +56,7 @@ route::post('user_register',[usercontrollers::class,'user_register']);
 route::get('login',[usercontrollers::class,'login']);
 route::post('user_login',[usercontrollers::class,'user_login']);
 
-route::get('products_deatils/{p_id}',[HomeController::class,'products_deatils']);
+route::get('products_details/{p_id}',[HomeController::class,'products_details']);
 route::get('user',[usercontrollers::class,'user']);
 
 
@@ -79,10 +79,10 @@ Route::post('checkout',[CouponController::class,'checkout']);
 // Route::post('apply-coupon',[CouponController::class,'applyCoupon']);
 
 
-route::get('order',[ordercontroller::class,'order']);
+// route::post('order',[ordercontroller::class,'order']);
 route::post('addorder',[ordercontroller::class,'addorder']);
 route::post('placeorder',[ordercontroller::class,'placeorder']);
-route::post('order_details/{o_id}',[ordercontroller::class,'order_details']);
+route::post('order_detailsaaa/{o_id}',[ordercontroller::class,'order_details']);
 Route::get('checkout',[CouponController::class,'checkout']);
 
 
@@ -93,3 +93,5 @@ route::post('placeorder',[ordercontroller::class,'placeorder']);
 
 
 route::post(' orders',[ordercontroller::class,'orders']);
+
+route::post('order',[CouponController::class,'order']);

@@ -60,7 +60,7 @@ public function applyCoupon(Request $request)
         'coupon_code' => 'required|string',
     ]);
 
-    $coupon = Coupon::where('coupon_code', $request->coupon_code)->first();
+    $coupon = coupon::where('coupon_code', $request->coupon_code)->first();
     if (!$coupon) {
         Session::put('coupon', [
             'discount' => 0,
@@ -87,30 +87,94 @@ public function applyCoupon(Request $request)
 
 
 
- public function checkout(Request $request) 
+
+//  public function checkout(Request $request) 
+// {
+//     // Fetch the user based on the session email
+//     $user = User::where('email', session('email'))->first();
+//     if (!$user) {
+//         return  view('home.checkout')->with('error', 'User not found.');
+//     }
+
+//     // Retrieve the user ID from the session
+//     $userId = session('u_id');
+//     if (!$userId) {
+//         return  view('home.checkout')->with('error', 'User ID not found in session.');
+//     }
+
+//     // Fetch the cart items for the user
+//     $cartItems = Cart::where('u_id', $userId)->get();
+//     if ($cartItems->isEmpty()) {
+//         return view('home.checkout')->with('error', 'Your cart is empty.');
+//     }
+
+//     // Calculate the total price of the cart items
+//     $totalPrice = $cartItems->sum('total_price');
+
+//     // Retrieve coupon details from the session
+//     $coupon = Session::get('coupon', [
+//         'discount' => 0,
+//         'shipping' => 0
+//     ]);
+
+//     $discount = $coupon['discount'];
+//     $shipping = $coupon['shipping'];
+
+//     // Calculate the final total price
+//     $finalPrice = $totalPrice - $discount + $shipping;
+
+//     // Create an order with the relevant details
+//     try {
+//         $order = Order::create([
+//             'u_id' => $userId,
+//             'amount' => $finalPrice, // Use the calculated final price
+//             'qty' => $cartItems->sum('quantity'), // Sum of quantities in the cart
+//         ]);
+//     } catch (\Exception $e) {
+//         // Log error or handle exception
+//         return  view('home.checkout')->with('error', 'Failed to create order: ' . $e->getMessage());
+//     }
+//     $cartItems = Cart::where('u_id', $userId)->get();
+
+
+//     // Insert order details and optionally clear the cart
+//     foreach ($cartItems as $item) {
+//         DB::table('order_details')->insert([
+//             'order_id' => $order->id, // Ensure correct column for order ID
+//             'product_id' => $item->product_id, 
+//             'qty' => $item->quantity,
+//             'price' => $item->price,
+//             'u_id' => $userId,
+//         ]);
+//     }
+
+//     $item->delete(); 
+//     return view('home.checkout', compact('cartItems', 'totalPrice', 'discount', 'shipping'));
+
+//         // Optionally clear the cart item
+//         // $item->delete(); // Use delete() instead of save() if clearing the cart
+// }
+
+public function checkout(Request $request)
 {
-    // Fetch the user based on the session email
     $user = User::where('email', session('email'))->first();
+
     if (!$user) {
-        return  view('home.checkout')->with('error', 'User not found.');
+        return view('home.checkout')->with('error', 'User not found.');
     }
 
-    // Retrieve the user ID from the session
     $userId = session('u_id');
     if (!$userId) {
-        return  view('home.checkout')->with('error', 'User ID not found in session.');
+        return view('home.checkout')->with('error', 'User ID not found in session.');
     }
 
-    // Fetch the cart items for the user
     $cartItems = Cart::where('u_id', $userId)->get();
     if ($cartItems->isEmpty()) {
         return view('home.checkout')->with('error', 'Your cart is empty.');
     }
 
-    // Calculate the total price of the cart items
-    $totalPrice = $cartItems->sum('total_price');
+    $totalPrice = $cartItems->sum('price');
 
-    // Retrieve coupon details from the session
     $coupon = Session::get('coupon', [
         'discount' => 0,
         'shipping' => 0
@@ -118,46 +182,11 @@ public function applyCoupon(Request $request)
 
     $discount = $coupon['discount'];
     $shipping = $coupon['shipping'];
-
-    // Calculate the final total price
     $finalPrice = $totalPrice - $discount + $shipping;
 
-    // Create an order with the relevant details
-    try {
-        $order = Order::create([
-            'u_id' => $userId,
-            'amount' => $finalPrice, // Use the calculated final price
-            'qty' => $cartItems->sum('quantity'), // Sum of quantities in the cart
-        ]);
-    } catch (\Exception $e) {
-        // Log error or handle exception
-        return  view('home.checkout')->with('error', 'Failed to create order: ' . $e->getMessage());
-    }
-    $cartItems = Cart::where('u_id', $userId)->get();
+    return view('home.checkout', compact('cartItems', 'totalPrice', 'discount', 'shipping', 'finalPrice'));
+}
 
-
-    // Insert order details and optionally clear the cart
-    foreach ($cartItems as $item) {
-        DB::table('order_details')->insert([
-            'order_id' => $order->id, // Ensure correct column for order ID
-            'product_id' => $item->product_id, // Add product_id
-            'qty' => $item->quantity,
-            'price' => $item->price,
-            'u_id' => $userId,
-        ]);
-    }
-
-    $item->delete(); 
-    return view('home.checkout', compact('cartItems', 'totalPrice', 'discount', 'shipping'));
-
-        // Optionally clear the cart item
-        // $item->delete(); // Use delete() instead of save() if clearing the cart
-    }
-
-    // Return the checkout view with the relevant details
-   // return view('home.checkout', compact('cartItems', 'totalPrice', 'discount', 'shipping'));
-//    return view('home.checkout', compact('cartItems', 'totalPrice', 'discount', 'shipping'));
-// }
 
 
 
@@ -267,5 +296,67 @@ public function applyCoupon(Request $request)
 
 
 
-     
+public function placeorder(Request $request)
+{
+
+    $user = User::where('email', session('email'))->first();
+    $userId = session('u_id');
+    if (!$userId) {
+        return view('home.checkout')->with('error', 'You need to be logged in to proceed to checkout.');
+    }
+    $cartItems = Cart::where('u_id', $userId)->get();
+
+    if ($cartItems->isEmpty()) {
+        return view('home.checkout')->with('error', 'Your cart is empty.');
+    }
+
+    $totalPrice = $cartItems->sum(function ($item) {
+        return $item->quantity * $item->product->price;
+    });
+
+    $coupon = session('coupon', [
+        'discount' => 0,
+        'shipping' => 0
+    ]);
+
+    $discount = $coupon['discount'];
+    $shipping = $coupon['shipping'];
+
+    $finalTotalPrice = $totalPrice - $discount + $shipping;
+
+    return view('home.checkout', compact('cartItems', 'totalPrice', 'discount', 'shipping', 'finalTotalPrice'));
+}
+
+
+    public function order(Request $request)
+    {
+        $cart_id = $request->id;
+
+        $cart = Cart::find($cart_id);
+
+        if (!$cart) {
+            return redirect()->back()->with('error', 'Cart not found.');
+        }
+
+        $user = User::where('email', session('email'))->first();
+
+        if (!$user) {
+            return redirect()->back()->with('error', 'User not found.');
+        }
+
+        foreach ($cart->items as $item) {
+            $order = new Order();
+            $order->p_id = $item->product_id;
+            $order->qty = $item->quantity;
+            $order->amount = $item->price * $item->quantity;
+            $order->u_id = $user->u_id;
+            $order->save();
+        }
+
+        // You might want to clear the cart after placing the order
+        // $cart->items()->delete();
+
+        return view('home.checkout')->with('success', 'Order placed successfully.');
+    }
+
 }

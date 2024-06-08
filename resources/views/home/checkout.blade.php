@@ -18,7 +18,7 @@
             <div class="row">
                 <div class="col-lg-8">
                     <h3>Billing Details</h3>
-                    <form class="row contact_form" action="{{ url('order_deatils') }}" method="POST" novalidate="novalidate">
+                    <form class="row contact_form" action="{{ url('order_details') }}" method="POST">
                         @csrf
                         <div class="col-md-6 form-group p_star">
                             <input type="text" class="form-control" id="first" name="first_name" placeholder="First Name" required>
@@ -54,7 +54,7 @@
                             </div>
                         </div>
                         <div class="col-md-12 form-group">
-                            <button type="submit" class="primary-btn" >Place Order</button>
+                            <button type="submit" class="btn-btn-primary">Place Order</button>
                         </div>
                     </form>
                 </div>
@@ -62,20 +62,18 @@
                     <div class="order_box">
                         <h2>Your Order</h2>
                         <ul class="list">
-                            <li><a href="#">Product <span>Total</span></a></li>
+                            {{-- <li><a href="#">Product <span>Total</span></a></li>
                             @foreach($cartItems as $item)
                                 <li><a href="#">{{ $item->product->name }} <span class="middle"> {{ $item->quantity }}</span> <span class="last">₹{{ $item->quantity * $item->product->price }}</span></a></li>
                             @endforeach
-                        </ul>
+                        </ul> --}}
                         <ul class="list list_2">
-                            <li><a>Subtotal <span>₹{{  $totalPrice   }}</span></li>
-                            <li><a>Discount <span>-₹{{ $discount }}</span></li>
-                            <li><a>Shipping <span>₹{{ $shipping }}</span></li>
-                            <li><a>Total <span  id="order_amount" >₹{{$totalPrice}}</span></li> 
-                            
-                            <li>Payment <span>Paypal</span></li>
+                            {{-- <li><a>Subtotal <span>₹{{ $totalPrice }}</span></a></li> --}}
+                            <li><a> <p>Discount: -₹<span id="displayDiscount">{{ session('coupon')['discount'] ?? 0 }}</span></p></a></li>
+                            <li><a>Shipping: ₹<span id="displayShipping">{{ session('coupon')['shipping'] ?? 0 }}</span></a></li>
+                            {{-- <li><a>Total Price: <span id="total-pro-prices">{{ $totalPrice - (session('coupon')['discount'] ?? 0) + (session('coupon')['shipping'] ?? 0) }}</span></a></li> --}}
                         </ul>
-                       
+                        
                         <div class="payment_item">
                             <div class="radion_btn">
                                 <input type="radio" id="f-option5" name="payment" value="cheque" checked>
@@ -102,8 +100,3 @@
 </section>
 
 @include('home.footer')
-
-
-
-
-
