@@ -105,13 +105,18 @@
                                                 <p>Total Price: <span id="total-main-price">{{ $totalPrice }}</span></p>
                                                 <p>Discount: -₹<span id="displayDiscount">{{ session('coupon')['discount'] ?? 0 }}</span></p>
                                                 <p>Shipping: ₹<span id="displayShipping">{{ session('coupon')['shipping'] ?? 0 }}</span></p>
-                                                <p>Total Price: <span id="total-pro-prices">{{ $totalPrice - (session('coupon')['discount'] ?? 0) + (session('coupon')['shipping'] ?? 0) }}</span></p>
-                                                <form action="{{url('order')}}" method="POST">
+                                                <p>Total Price: <span id="finalTotal">{{ $totalPrice - (session('coupon')['discount'] ?? 0) + (session('coupon')['shipping'] ?? 0) }}</span></p>
+                                                {{-- <form action="{{url('order')}}" method="POST">
                                                     @csrf
                                                   
                                                 <button type="submit" name="submit" class="main_btn"><a href="{{ url('checkout') }}">Checkout</a></button>
-                                                </form>
-                                            </div>
+                                                </form> --}}
+                                        </form>
+                                        <form action="{{ url('checkout') }}" method="POST" id="checkoutForm">
+                                            @csrf
+                                            <input type="hidden" name="totalQuantity" value="{{ $totalQuantity }}">
+                                            <input type="hidden" name="totalPrice" value="{{ $totalPrice }}">
+                                            <button type="submit" class="main_btn">Checkout</button>
                                         </form>
                                         
                                     </div>
@@ -150,32 +155,32 @@
     }
 
     function updateCartQty(itemId) {
-        var qty = document.getElementById('sst-' + itemId).value;
-        var couponCode = document.getElementById('coupon_code') ? document.getElementById('coupon_code').value : null;
-        
+    var qty = document.getElementById('sst-' + itemId).value;
+    var couponCode = document.getElementById('coupon_code') ? document.getElementById('coupon_code').value : null;
 
-        fetch(`{{ url('update-cart') }}/${itemId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({ qty: qty, coupon_code: couponCode })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                document.getElementById('total-price-' + itemId).innerText = '₹' + data.itemTotalPrice;
-                document.getElementById('totalQuantity').innerText = data.totalQuantity;
-                document.getElementById('totalPrice').innerText = '₹' + data.totalPrice;
-                document.getElementById('total-main-price').innerText = '₹' + data.totalPrice;
-                // document.getElementById('displayDiscount').innerText = '₹' + data.discount;
-                // document.getElementById('displayShipping').innerText = '₹' + data.shipping;
-                document.getElementById('total-pro-prices').innerText = '₹' + data.totalPrice;
-            } else {
-                alert(data.message);
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    }   
+    fetch(`{{ url('update-cart') }}/${itemId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ qty: qty, coupon_code: couponCode })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('total-price-' + itemId).innerText = '₹' + data.itemTotalPrice;
+            document.getElementById('totalQuantity').innerText = data.totalQuantity;
+            document.getElementById('totalPrice').innerText = '₹' + data.totalPrice;
+            document.getElementById('total-main-price').innerText = '₹' + data.totalPrice;
+            document.getElementById('displayDiscount').innerText = '₹' + data.discount;
+            document.getElementById('displayShipping').innerText = '₹' + data.shipping;
+            document.getElementById('finalTotal').innerText = '₹' + data.finalTotal;
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
 </script>

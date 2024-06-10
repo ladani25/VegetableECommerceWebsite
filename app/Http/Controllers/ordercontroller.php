@@ -3,87 +3,82 @@
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Order;
-use App\Models\ordersitems;
-use App\Models\Shipping;
 use App\Models\User;
 use App\Models\Cart;
 use App\Models\order_deatils;
-use App\Models\Product;
-use App\Models\Coupon;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
-
-
-
+use Razorpay\Api\Api;
 class ordercontroller extends Controller
 {
-    public function order(Request $request)
-    {
-        $cart_id = $request->id;
-    
-        $cart = Cart::find($cart_id);
-    
-        if (!$cart) {
-            return redirect()->back()->with('error', 'Cart not found.');
-        }
-    
-        $user = User::where('email', session('email'))->first();
-    
-        if (!$user) {
-            return redirect()->back()->with('error', 'User not found.');
-        }
-    
-        foreach ($cart->items as $item) {
-            $order = new Order();
-            // $order->p_id = $item->product_id;
-            $order->qty = $item->quantity;
-            $order->amount = $item->price * $item->quantity;
-            $order->u_id = $user->u_id;
-            $order->save();
-        }
-    
-        // You might want to clear the cart after placing the order
-        // $cart->items()->delete();
-    
-        return view('home.checkout')->with('success', 'Order placed successfully.');
-    }
+   
 
-    // public function order_deatils(Request $request)
+
+    // public function  place_order(Request $request)
     // {
-    //     $cart_id = $request->cart_id;
 
-    //     $cart = Cart::find($cart_id); // Assuming you have a Cart model and you can retrieve a cart by its ID
+    //     // Validate the request
+    //     $request->validate([
+    //         'first_name' => 'required|string',
+    //         'last_name' => 'required|string',
+    //         'address1' => 'required|string',
+    //         'address2' => 'nullable|string',
+    //         'coupon' => 'nullable|numeric',
+    //         'phone' => 'required|numeric',
+    //         'post_code' => 'nullable|string',
+    //         'email' => 'required|string',
+    //         'payment_method' => 'required|string',
+    //     ]);
 
-    //     if (!$cart) {
-    //         return redirect()->back()->with('error', 'Cart not found.'); // Corrected error message
+    //     $cartItems = Cart::where('u_id', session('u_id'))->get();
+
+    //     if ($cartItems->isEmpty()) {
     //     }
+
+    //     $totalQuantity = $cartItems->sum('quantity');
+    //     $totalPrice = $cartItems->sum(function ($item) {
+    //         return $item->quantity * $item->price;
+    //     });
+
+    //     $coupon = session('coupon', [
+    //         'discount' => 0,
+    //         'shipping' => 0
+    //     ]);
+
+    //     $discount = $coupon['discount'];
+    //     $shipping = $coupon['shipping'];
+    //     $finalPrice = $totalPrice - $discount + $shipping;
+
+    //     // Optionally, save order items or any other order-related data here
+
+
+    //     $user = auth()->user();
+    //     $totalQuantity = $request->input('totalQuantity');
+    //     $totalPrice = $request->input('totalPrice');
+        
 
     //     $user = User::where('email', session('email'))->first();
-        
-    //     if (!$user) {
-    //         return redirect()->back()->with('error', 'User not found.');
-    //     }
+    //     $user_id = $user->u_id;
 
-    //     $ordersitems= new ordersitems(); // Corrected object instantiation
+    //         $order_deatils =  new order_deatils();
+    //         // $order_deatils->order_id = $request->order_id;
+    //         // $order_deatils->order_number = 'ORD-' . strtoupper(uniqid());
+    //         $order_deatils->totalal_amout=  $finalPrice;
+    //         $order_deatils->sub_totale= $totalPrice;
+    //         $order_deatils->discount = $discount;
+    //         $order_deatils->payment_type = $request->payment_method;
+    //         $order_deatils->payment_status = 'Unpaid';
+    //         $order_deatils->order_date = now();
+    //         $order_deatils->u_id =  $user_id ->u_id;
 
-    //     $user_id = $user->u_id; // Assuming the user ID column is 'id', adjust if it's 'u_id'
-    //     $products_id = $cart->p_id; // Assuming this is how you get product IDs from the cart
+    //         $order_deatils->save();
 
-    //     // Assuming you need to loop through cart items
-    //     foreach ($cart->items as $item) {
-    //         // $order->p_id = $item->product_id;
-    //         $ordersitems->qty = $item->quantity; // Assuming each item has a quantity
-    //         $ordersitems->amount = $item->price * $item->quantity; // Assuming you calculate amount based on price and quantity
-    //         $ordersitems->u_id = $user_id;
-    //         $->save();
- 
-    //     }
+    //         return view('payment', compact('totalQuantity', 'totalPrice', 'discount', 'shipping', 'finalPrice'));
 
     // }
 
-
-    public function order_details(Request $request)
+    public function  place_order(Request $request)
     {
+        // Validate the request
         $request->validate([
             'first_name' => 'required|string',
             'last_name' => 'required|string',
@@ -92,117 +87,101 @@ class ordercontroller extends Controller
             'coupon' => 'nullable|numeric',
             'phone' => 'required|numeric',
             'post_code' => 'nullable|string',
-            'email' => 'required|string'
+            'email' => 'required|string|email',
+            'payment_method' => 'required|string',
         ]);
     
-        try {
-            // Fetch cart items for the current user
-            $cartItems = Cart::where('u_id', auth()->id())->whereNull('order_id')->get();
-            dd($cartItems);
-            // Calculate total price of cart items
-            $totalPrice = $cartItems->sum(function ($item) {
-                return $item->quantity * $item->product->price;
-            });
+        //Fetch cart items for the current user
+        $cartItems = Cart::where('u_id', session('u_id'))->get();
     
-            // Fetch shipping price from the request (assuming it's submitted via a form)
-            $shippingPrice = Shipping::find($request->shipping)->price;
-    
-            // Fetch coupon from the request
-            $coupon = $request->coupon ?? 0;
-    
-            // Calculate final total amount
-            $finalTotal = $totalPrice + $shippingPrice - $coupon;
-    
-            // Save order details
-            $order = new Order();
-            $order->order_number = 'ORD-' . strtoupper(uniqid());
-            $order->user_id = auth()->id();
-            $order->sub_total = $totalPrice;
-            $order->quantity = $cartItems->sum('quantity');
-            $order->coupon = $coupon;
-            $order->total_amount = $finalTotal;
-            $order->status = "new";
-            // Assuming payment method is submitted via form
-            $order->payment_method = $request->payment_method;
-            $order->payment_status = 'Unpaid';
-            $order->save();
-    
-            // Insert order details
-            $orderDetails = new ordersitems();
-            $orderDetails->order_id = $order->id;
-            $orderDetails->total_amount = $finalTotal;
-            $orderDetails->sub_total = $totalPrice;
-            $orderDetails->discount = $coupon;
-            $orderDetails->payment_type = $request->payment_method;
-            $orderDetails->payment_status = 'Unpaid';
-            $orderDetails->order_date = now();
-            $orderDetails->u_id = auth()->id();
-            $orderDetails->save();
-    
-            // Update cart with order_id
-            Cart::where('u_id', auth()->id())->whereNull('order_id')->update(['order_id' => $order->id]);
-    
-            // Clear cart and coupon session
-            Session::forget('cart');
-            Session::forget('coupon');
-    
-            // Pass necessary data to the view
-            return view('home.checkout', compact('cartItems', 'totalPrice', 'coupon', 'shippingPrice', 'finalTotal'))
-                ->with('success', 'Your product was successfully placed in the order.');
-        } catch (\Exception $e) {
-            // Log the error or handle it accordingly
-            return view('home.checkout', compact('cartItems', 'totalPrice', 'coupon', 'shippingPrice', 'finalTotal'))->with('error', 'Failed to place order: ' . $e->getMessage());
+        if ($cartItems->isEmpty()) {
+            // return redirect()->route('home')->with('error', 'Your cart is empty.');
         }
-    }
     
+        $totalQuantity = $cartItems->sum('quantity');
+        $totalPrice = $cartItems->sum(function ($item) {
+            return $item->quantity * $item->price;
+        });
     
-    public function placeorder(Request $request)
-    {
-        $order = Order::find($request->o_id);
-        $order->status = "process";
-        $order->save();
-    }
-
+        $coupon = session('coupon', [
+            'discount' => 0,
+            'shipping' => 0
+        ]);
     
-
-    public function orders(Request $request)
-    {
+        $discount = $coupon['discount'];
+        $shipping = $coupon['shipping'];
+        $finalPrice = $totalPrice - $discount + $shipping;
+    
+        // Save order details
         $user = User::where('email', session('email'))->first();
-        // dd($user);
-        $userId = session('u_id');
+        $user_id = $user->u_id;
+    
+        $orderDetails = new order_deatils();
+        $orderDetails->order_id	 = '#' . strtoupper(uniqid());
+        $orderDetails->totalal_amout = $finalPrice; // Correctly bind final price
+        $orderDetails->sub_totale = $totalPrice;
+        $orderDetails->discount	 = $discount;
+        $orderDetails->payment_type = $request->payment_method;
+        $orderDetails->payment_status = 'Unpaid';
+        $orderDetails->order_date = now();
+        $orderDetails->u_id = $user->u_id;
+        $orderDetails->address = $request->input('first_name') . ', '. $request->input('last_name') . ', '. $request->input('phone') . ', '.$request->input('email') . ', '. $request->input('address1') . ', ' . $request->input('address2'). ', '. $request->input('post_code');
 
-        // $cartItems = cart::where('u_id', $userId)->get();
-        // $order  = DB::table('order')
-        // ->join('carts', 'order.order_id', '=', 'carts.id')
-        // // ->join('user', 'wishlists.u_id', '=', 'user.u_id')
-        // ->where('order.u_id')
-        // ->select('order.*', 'carts.*')
-        // ->get();
-        $cartItems = Cart::where('u_id', $userId)->get();
+        $orderDetails->save();
+        // Clear cart and coupon session
+        // Session::forget('cart');
+        // Session::forget('coupon');
+    
+        return view('home.payment')->with('success', 'Your order was successfully placed.');
+    }
+    
 
-        // Assuming you have an Order model and an orders table
-        $order = Order::create([
-            'u_id' => $userId,
-            'amount' => $request->amount,
-            'quantity' => $request->quantity,
+
+    public function payment(Request $request)
+    {
+        // Validate the payment request
+        $request->validate([
+            'amount' => 'required|numeric|min:1',
+            'currency' => 'required|string',
+            'name' => 'required|string',
+            'email' => 'required|email',
+            'contact_number' => 'required|string',
+            'description' => 'nullable|string',
         ]);
 
-        dd($cartItems);
+        // Initialize Razorpay API with your API key and secret
+        $api = new Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
 
-        // Insert order details
-        foreach ($cartItems as $item) {
-            DB::table('orde')->insert([
-                'order_id' => $order->id,
-                'product_id' => $item->product_id,
-                'quantity' => $item->quantity,
-                'price' => $item->price,
-            ]);
+        // Create an order
+        $order = $api->order->create([
+            'amount' => $request->amount * 100, // Amount in paisa
+            'currency' => $request->currency,
+            'receipt' => uniqid(),
+            'payment_capture' => 1, // Auto capture payment
+        ]);
 
-            // Optionally, clear the cart after processing the order
-            $item->delete();
-        }
+        // Return the order details and Razorpay key to the payment form
+        return view('razorpay.payment', [
+            'order' => $order,
+            'key' => env('RAZORPAY_KEY'),
+            'name' => $request->name,
+            'email' => $request->email,
+            'contact_number' => $request->contact_number,
+            'description' => $request->description,
+        ]);
+    }
 
-        return view('home.checkout')->with('success', 'Order placed successfully!');
-    }     
-   
+    public function success(Request $request)
+    {
+        // Handle successful payment
+        return view('razorpay.success', ['payment' => $request->all()]);
+    }
+
+    public function failure(Request $request)
+    {
+        // Handle failed payment
+        return view('razorpay.failure', ['payment' => $request->all()]);
+    }
+
+
 }
