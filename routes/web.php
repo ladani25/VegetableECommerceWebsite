@@ -8,6 +8,7 @@ use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\usercontrollers;
 use App\Http\Controllers\CouponController;
 use App\Http\Controllers\ordercontroller;
+use App\Http\Controllers\PayPalController;
 use Illuminate\Support\Facades\Route;
 
 // Route::get('/', function () {
@@ -76,6 +77,8 @@ route::post('removeall',[cartcontroller::class,'removeall']);
 
 Route::post('apply-coupon', [CouponController::class, 'applyCoupon']);
 Route::post('checkout',[CouponController::class,'checkout']);
+// Route::match(['get', 'post'], '/checkout', 'CouponController')->name('checkout');
+
 
 
 
@@ -86,3 +89,7 @@ Route::post('checkout',[CouponController::class,'checkout']);
 
 Route::post('place_order',[ordercontroller::class,'place_order']);
 // Route::post('ordrs-pl',[ordercontroller::class,'order_place']);
+
+
+Route::get('/payment-status', [OrderController::class, 'paymentStatus'])->name('payment.status');
+

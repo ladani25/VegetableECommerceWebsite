@@ -18,7 +18,7 @@
             <div class="row">
                 <div class="col-lg-8">
                     <h3>Billing Details</h3>
-                    <form class="row contact_form" action="{{url('place_order')}}" method="post">
+                    <form class="row contact_form" action="{{ url('place_order') }}" method="post" id="checkout_form">
                         @csrf
                         <div class="col-md-6 form-group p_star">
                             <input type="text" class="form-control" id="first" name="first_name" placeholder="First Name" value="{{ old('first_name') }}" required>
@@ -63,22 +63,21 @@
                             @endif
                         </div>
                         <div class="col-md-12 form-group">
-                            <select class="form-control" name="payment_method" required>
+                            <select class="form-control" name="payment_method" id="payment_method" required>
                                 <option value="" disabled selected>Select Payment Method</option>
-                                <option value="paypal" {{ old('payment_method') == 'paypal' ? 'selected' : '' }}>PayPal</option>
-                                <option value="cheque" {{ old('payment_method') == 'cheque' ? 'selected' : '' }}>Case on delivery</option>
+                                <option id="rzp-button1" value="paypal" {{ old('payment_method') == 'paypal' ? 'selected' : '' }}>PayPal</option>
+                                <option value="cheque" {{ old('payment_method') == 'cheque' ? 'selected' : '' }}>Cash on Delivery</option>
                             </select>
                             @if ($errors->has('payment_method'))
                                 <span class="text-danger">{{ $errors->first('payment_method') }}</span>
                             @endif
                         </div>
-                      
+                        
                         <div class="col-md-12 form-group">
-                            {{-- <input type="hidden" name="totalal_amout" value="{{  $finalPrice }}">
-                            <input type="hidden" name="sub_totale" value="{{ $totalPrice }}"> --}}
-                            <button type="submit"  name="submit" class="btn btn-primary">Place Order</button>
+                            <button type="submit" name="submit" class="btn btn-primary" id="place_order_btn">Place Order</button>
                         </div>
-                    {{-- </form> --}}
+                    </form>
+                    <div id="paypal-button-container" style="display: none;"></div>
                 </div>
                 <div class="col-lg-4">
                     <div class="order_box">
@@ -86,56 +85,50 @@
                         <ul class="list">
                             <li><a href="#">Product <span>Total</span></a></li>
                             @foreach($cartItems as $item)
-                                <li><a href="#">{{ $item->product->name }} <span class="middle"> {{ $item->quantity }}</span> <span class="last">₹{{ $item->quantity * $item->product->price }}</span></a></li>
+                                <li><a href="#">{{ $item->product->name }} <span class="middle">{{ $item->quantity }}</span> <span class="last">₹{{ $item->quantity * $item->product->price }}</span></a></li>
                             @endforeach
                         </ul>
                         <ul class="list list_2">
                             <li><a>Subtotal <span name="sub_totale">₹{{ $totalPrice }}</span></a></li>
-                            <li><a> <p>Discount: -₹<span id="displayDiscount">{{ session('coupon')['discount'] ?? 0 }}</span></p></a></li>
+                            <li><a>Discount: -₹<span id="displayDiscount">{{ session('coupon')['discount'] ?? 0 }}</span></a></li>
                             <li><a>Shipping: ₹<span id="displayShipping">{{ session('coupon')['shipping'] ?? 0 }}</span></a></li>
                             <li><a>Total Price: <span id="total-pro-prices" name="totalal_amout">{{ $totalPrice - (session('coupon')['discount'] ?? 0) + (session('coupon')['shipping'] ?? 0) }}</span></a></li>
                         </ul>
-                        
-                        {{-- <div class="payment_item">
-                            <div class="radion_btn">
-                                <input type="radio" id="f-option5" name="payment" value="cheque" checked>
-                                <label for="f-option5">Check payments</label>
-                                <div class="check"></div>
-                            </div>
-                            <p>Please send a check to Store Name, Store Street, Store Town, Store State / County, Store Postcode.</p>
-                        </div> --}}
-                        {{-- <div class="payment_item active">
-                            <div class="radion_btn">
-                                <input type="radio" id="f-option6" name="payment" value="paypal">
-                                <label for="f-option6">Paypal</label>
-                                <img src="{{ url('front-end/img/product/single-product/card.jpg')}}" alt="">
-                                <div class="check"></div>
-                            </div>
-                            <p>Pay via PayPal; you can pay with your credit card if you don’t have a PayPal account.</p>
-                        </div> --}}
-                        {{-- <button class="primary-btn"  name="submit" type="submit">Proceed to PayPal</button> --}}
                     </div>
                 </div>
             </div>
-        </form>
         </div>
     </div>
 </section>
 
 @include('home.footer')
 
+{{-- <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
-    document.getElementById('payment_method').addEventListener('change', function() {
-        var selectedPaymentMethod = this.value;
-        if (selectedPaymentMethod === 'paypal') {
-            document.getElementById('paypal_payment_form').style.display = 'block';
-            document.getElementById('cod_payment_form').style.display = 'none';
-        } else if (selectedPaymentMethod === 'cheque') {
-            document.getElementById('cod_payment_form').style.display = 'block';
-            document.getElementById('paypal_payment_form').style.display = 'none';
-        } else {
-            document.getElementById('paypal_payment_form').style.display = 'none';
-            document.getElementById('cod_payment_form').style.display = 'none';
-        }
-    });
-</script>
+var options = {
+    "key": "YOUR_KEY_ID",
+    "amount": "50000",
+    "currency": "INR",
+    "name": "Acme Corp",
+    "description": "Test Transaction",
+    "image": "https://example.com/your_logo",
+    "order_id": "order_9A33XWu170gUtm",
+    "callback_url": "https://eneqd3r9zrjok.x.pipedream.net/",
+    "prefill": {
+        "name": "Gaurav Kumar",
+        "email": "gaurav.kumar@example.com",
+        "contact": "9000090000"
+    },
+    "notes": {
+        "address": "Razorpay Corporate Office"
+    },
+    "theme": {
+        "color": "#3399cc"
+    }
+};
+var rzp1 = new Razorpay(options);
+document.getElementById('rzp-button1').onclick = function(e){
+    rzp1.open();
+    e.preventDefault();
+}
+</script> --}}
