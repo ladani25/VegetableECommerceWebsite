@@ -10,4 +10,7 @@
     <p>{{ $message }}</p>
 </div>
 
+{{-- <div style="margin-bottom: 50%"> --}}
 @include('home.footer')
+
+{{-- </div> --}}

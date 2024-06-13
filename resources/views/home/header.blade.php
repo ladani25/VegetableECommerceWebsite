@@ -48,7 +48,7 @@
             <div class="row w-100 mr-0">
               <div class="col-lg-7 pr-0">
                 <ul class="nav navbar-nav center_nav pull-right">
-                  <li class="nav-item active">
+                  <li class="nav-item">
                     <a class="nav-link" href="{{url('home')}}">Home</a>
                   </li>
                   <li class="nav-item ">
@@ -64,9 +64,9 @@
                       </li>
                       @endforeach --}}
                     
-                      <li class="nav-item">
+                      {{-- <li class="nav-item">
                         <a class="nav-link" href="{{url('shop_categeroy')}}">Shop Category</a>
-                      </li>
+                      </li> --}}
                       
                       {{-- <li class="nav-item">
                         <a class="nav-link" href="checkout.html">Product Checkout</a>

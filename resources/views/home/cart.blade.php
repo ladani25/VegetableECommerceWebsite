@@ -13,7 +13,7 @@
 @endif
 
 <section class="cart_area section_gap">
-    <div style="padding-left:70%">
+    <div style="padding-left:73%">
         <form action="{{ url('removeall') }}" method="POST">
             @csrf
             <button type="submit" class="btn btn-danger mt-2">Remove All</button>
@@ -54,13 +54,15 @@
                                 <td>
                                     <div style="box-sizing: border-box;">
                                         <div class="product_count">
-                                            <input type="number" name="qty" id="sst-{{ $item->id }}" value="{{ $item->quantity }}" title="Quantity:" class="input-text qty" min="1" max="10" onchange="updateCartQty({{ $item->id }});">
-                                            <button onclick="event.preventDefault(); increaseQty({{ $item->id }});" class="increase items-count" type="button">
+                                          <!-- Assume each item has a product ID associated with it, available as $item->product_id -->
+                                            <input type="number" name="qty" id="sst-{{ $item->id }}" value="{{ $item->quantity }}" title="Quantity:" class="input-text qty" min="1" max="10" onchange="updateCartQty({{ $item->id }}, {{ $item->p_id }});">
+                                            <button onclick="event.preventDefault(); increaseQty({{ $item->id }}, {{ $item->p_id }});" class="increase items-count" type="button">
                                                 <i class="lnr lnr-chevron-up"></i>
                                             </button>
-                                            <button onclick="event.preventDefault(); decreaseQty({{ $item->id }});" class="reduced items-count" type="button">
+                                            <button onclick="event.preventDefault(); decreaseQty({{ $item->id }}, {{ $item->p_id }});" class="reduced items-count" type="button">
                                                 <i class="lnr lnr-chevron-down"></i>
                                             </button>
+
                                         </div>
                                     </div>
                                 </td>
@@ -133,7 +135,8 @@
 @include('home.footer')
 
 <script>
-    function increaseQty(itemId) {
+    function increaseQty(itemId, productId) {
+    console.log('increaseQty called with itemId:', itemId, 'and productId:', productId);
         var result = document.getElementById('sst-' + itemId);
         var sst = parseInt(result.value);
         if (!isNaN(sst)) {
@@ -141,46 +144,51 @@
             if (result.value > 100) {
                 result.value = 100;
             }
-            updateCartQty(itemId);
+            updateCartQty(itemId, productId, 1);
         }
     }
 
-    function decreaseQty(itemId) {
+    function decreaseQty(itemId, productId) {
         var result = document.getElementById('sst-' + itemId);
         var sst = parseInt(result.value);
         if (!isNaN(sst) && sst > 1) {
             result.value = sst - 1;
-            updateCartQty(itemId);
+            updateCartQty(itemId, productId, -1);
         }
     }
 
-    function updateCartQty(itemId) {
-    var qty = document.getElementById('sst-' + itemId).value;
-    var couponCode = document.getElementById('coupon_code') ? document.getElementById('coupon_code').value : null;
+    function updateCartQty(itemId, productId, qtyChange) {
+    console.log('increaseQty called with itemId:', itemId, 'and productId:', productId);
 
-    fetch(`{{ url('update-cart') }}/${itemId}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        },
-        body: JSON.stringify({ qty: qty, coupon_code: couponCode })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            document.getElementById('total-price-' + itemId).innerText = '₹' + data.itemTotalPrice;
-            document.getElementById('totalQuantity').innerText = data.totalQuantity;
-            document.getElementById('totalPrice').innerText = '₹' + data.totalPrice;
-            document.getElementById('total-main-price').innerText = '₹' + data.totalPrice;
-            document.getElementById('displayDiscount').innerText = '₹' + data.discount;
-            document.getElementById('displayShipping').innerText = '₹' + data.shipping;
-            document.getElementById('finalTotal').innerText = '₹' + data.finalTotal;
-        } else {
-            alert(data.message);
-        }
-    })
-    .catch(error => console.error('Error:', error));
-}
+        var qty = document.getElementById('sst-' + itemId).value;
+        var couponCode = document.getElementById('coupon_code') ? document.getElementById('coupon_code').value : null;
 
+        fetch(`{{ url('update-cart') }}/${itemId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ qty: qty, coupon_code: couponCode, product_id: productId, qty_change: qtyChange })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('total-price-' + itemId).innerText = '₹' + data.itemTotalPrice;
+                document.getElementById('totalQuantity').innerText = data.totalQuantity;
+                document.getElementById('totalPrice').innerText = '₹' + data.totalPrice;
+                document.getElementById('total-main-price').innerText = '₹' + data.totalPrice;
+                document.getElementById('displayDiscount').innerText = '₹' + data.discount;
+                document.getElementById('displayShipping').innerText = '₹' + data.shipping;
+                document.getElementById('finalTotal').innerText = '₹' + data.finalTotal;
+
+                // Update product quantity
+                document.getElementById('product-qty-' + productId).innerText = data.productQuantity;
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
 </script>
+

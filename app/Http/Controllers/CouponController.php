@@ -6,6 +6,7 @@ use App\Models\Coupon;
 use App\Models\Cart;
 use App\Models\order;
 use App\Models\User;
+use App\Models\Product;
 use Illuminate\Support\Facades\Session;
 
 
@@ -55,6 +56,7 @@ class CouponController extends Controller
      
     public function checkout(Request $request)
     {
+        // dd($request->all());
         $cartItems = Cart::where('u_id', session('u_id'))->get();
 
         if ($cartItems->isEmpty()) {
@@ -81,13 +83,12 @@ class CouponController extends Controller
         $user = auth()->user();
         $totalQuantity = $request->input('totalQuantity');
         $totalPrice = $request->input('totalPrice');
-        
-
+      
         $user = User::where('email', session('email'))->first();
         $user_id = $user->u_id;
     
             // Retrieve the user's ID
-        
+
         // Create the order
         $order = new order();
         $order->u_id = $user->u_id;
@@ -95,8 +96,72 @@ class CouponController extends Controller
         $order->amount = $totalPrice;
         $order->save();
 
+        // $this->updateProductQuantities($request->id);
+        $this->updateProductQuantities($order->id);
+
+       Session::put('order', [
+           'amount' => $totalPrice
+       ]);
         return view('home.checkout', compact('cartItems', 'totalPrice', 'discount', 'shipping', 'finalPrice'));
     }
+
+    // public function updateProductQuantities($id)
+    // {
+    //     dd($id);
+    //     $order = cart::where('id', $id)->get();
+    //     // dd($order);
+
+    //     foreach ($order as $order) {
+    //         $product = Product::find($order->p_id);
+    //         // dd($product);
+
+    //         if ($product) {
+    //             $product->p_quantity -= $order->quantity;
+    //             $product->save();
+    //         }
+    //     }
+    // }
+
+    // public function updateProductQuantities($u_id )
+    // {
+    //     // dd($order_id);
+    //     // Retrieve cart items related to the order
+    //     $cartItems = Cart::where('id', $u_id )->get();
+    //     dd($cartItems);
+    //     foreach ($cartItems as $cartItem) {
+    //         $product = Product::find($cartItem->p_id);
+
+    //         if ($product) {
+    //             $product->p_quantity -= $cartItem->quantity;
+    //             $product->save();
+    //         }
+    //     }
+    // }
+
+    public function updateProductQuantities($order_id)
+    {
+        $cartItems = Cart::where('id', $order_id)->get();
+    
+        foreach ($cartItems as $item) {
+            $product = Product::find($item->p_id);
+    
+            if ($product) {
+                if ($product->p_quantity >= $item->quantity) {
+                    $product->p_quantity -= $item->quantity;
+                    $product->save();
+                } else {
+                    // Handle out of stock scenario
+                    return redirect()->back()->with('error', 'One or more items in your cart are out of stock.');
+                }
+            } else {
+                // Handle case where product is not found (optional)
+                return redirect()->back()->with('error', 'Product not found.');
+            }
+        }
+    
+        // Continue with further processing if all products are available
+    }
+    
 
 
 }

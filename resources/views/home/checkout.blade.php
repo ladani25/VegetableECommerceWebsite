@@ -65,19 +65,24 @@
                         <div class="col-md-12 form-group">
                             <select class="form-control" name="payment_method" id="payment_method" required>
                                 <option value="" disabled selected>Select Payment Method</option>
-                                <option id="rzp-button1" value="paypal" {{ old('payment_method') == 'paypal' ? 'selected' : '' }}>PayPal</option>
+                                <option value="razorpay" {{ old('payment_method') == 'razorpay' ? 'selected' : '' }}>Razorpay</option>
                                 <option value="cheque" {{ old('payment_method') == 'cheque' ? 'selected' : '' }}>Cash on Delivery</option>
                             </select>
                             @if ($errors->has('payment_method'))
                                 <span class="text-danger">{{ $errors->first('payment_method') }}</span>
                             @endif
+                            @if (isset($payment_id))
+                            <input type="hidden" name="payment_id" value="{{ $payment_id }}">
+                        @endif
                         </div>
                         
                         <div class="col-md-12 form-group">
                             <button type="submit" name="submit" class="btn btn-primary" id="place_order_btn">Place Order</button>
                         </div>
                     </form>
-                    <div id="paypal-button-container" style="display: none;"></div>
+                    <div id="razorpay-button-container" style="display: none;">
+                        <button id="rzp-button1" class="btn btn-primary">Pay with Razorpay</button>
+                    </div>
                 </div>
                 <div class="col-lg-4">
                     <div class="order_box">
@@ -101,34 +106,105 @@
     </div>
 </section>
 
-@include('home.footer')
-
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 {{-- <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
-var options = {
-    "key": "YOUR_KEY_ID",
-    "amount": "50000",
-    "currency": "INR",
-    "name": "Acme Corp",
-    "description": "Test Transaction",
-    "image": "https://example.com/your_logo",
-    "order_id": "order_9A33XWu170gUtm",
-    "callback_url": "https://eneqd3r9zrjok.x.pipedream.net/",
-    "prefill": {
-        "name": "Gaurav Kumar",
-        "email": "gaurav.kumar@example.com",
-        "contact": "9000090000"
-    },
-    "notes": {
-        "address": "Razorpay Corporate Office"
-    },
-    "theme": {
-        "color": "#3399cc"
+    var options = {
+        "key": "{{ env('RAZORPAY_KEY') }}", // Enter the Key ID generated from the Dashboard
+        "amount": "{{ $totalPrice * 100 }}", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise or ₹500.
+        "currency": "INR",
+        "name": "{{ env('APP_NAME') }}",
+        "description": "Thank you for shopping with us",
+        "order_id": "{{ Session::get('order_id') }}", // Replace with Order ID generated in Step 1
+        "callback_url": "https://yourdomain.com/payment-success", // Your callback URL
+        "notes": {
+            "address": "Razorpay Corporate Office"
+        },
+        "theme": {
+            "color": "#3399cc"
+        },
+        "handler": function (response){
+            // Handle the successful payment response
+            console.log(response);
+
+            // Add the payment ID to the form and submit the form
+            var form = document.getElementById('checkout_form');
+            var paymentIdInput = document.createElement('input');
+            paymentIdInput.type = 'hidden';
+            paymentIdInput.name = 'payment_id';
+            paymentIdInput.value = response.razorpay_payment_id;
+            form.appendChild(paymentIdInput);
+            form.submit();
+        }
+    };
+
+    var rzp1 = new Razorpay(options);
+
+    document.getElementById('rzp-button1').onclick = function(e){
+        e.preventDefault();
+        rzp1.open();
     }
-};
-var rzp1 = new Razorpay(options);
-document.getElementById('rzp-button1').onclick = function(e){
-    rzp1.open();
-    e.preventDefault();
-}
+
+    document.getElementById('payment_method').onchange = function() {
+        var value = this.value;
+        if (value === 'razorpay') {
+            document.getElementById('razorpay-button-container').style.display = 'block';
+        } else {
+            document.getElementById('razorpay-button-container').style.display = 'none';
+        }
+    }
 </script> --}}
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    var options = {
+        "key": "{{ env('RAZORPAY_KEY') }}",
+        "amount": "{{ $totalPrice * 100 }}",
+        "currency": "INR",
+        "name": "{{ env('APP_NAME') }}",
+        "description": "Thank you for shopping with us",
+        "order_id": "{{ Session::get('order_id') }}",
+        "callback_url": "https://yourdomain.com/payment-success",
+        "notes": {
+            "address": "Razorpay Corporate Office"
+        },
+        "theme": {
+            "color": "#3399cc"
+        },
+        "handler": function (response){
+            // Handle the successful payment response
+            console.log(response);
+
+            // Add the payment ID to the form and submit the form
+            var form = document.getElementById('checkout_form');
+            var paymentIdInput = document.createElement('input');
+            paymentIdInput.type = 'hidden';
+            paymentIdInput.name = 'payment_id';
+            paymentIdInput.value = response.razorpay_payment_id;
+            form.appendChild(paymentIdInput);
+
+            // Submit the form
+            form.submit();
+        }
+    };
+
+    var rzp1 = new Razorpay(options);
+
+    document.getElementById('rzp-button1').onclick = function(e){
+        e.preventDefault();
+        rzp1.open();
+    }
+
+    document.getElementById('payment_method').onchange = function() {
+        var value = this.value;
+        if (value === 'razorpay') {
+            document.getElementById('razorpay-button-container').style.display = 'block';
+        } else {
+            document.getElementById('razorpay-button-container').style.display = 'none';
+        }
+    }
+</script>
+
+
+
+@include('home.footer')
