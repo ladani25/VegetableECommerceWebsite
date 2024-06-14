@@ -23,7 +23,6 @@ class cartcontroller extends Controller
         if ($user) {
             // Retrieve the user's ID
             $user_id = $user->u_id;
-    
             // Fetch cart items with product details and calculate total price for each item
             $cartItems = DB::table('carts')
                 ->join('products', 'carts.p_id', '=', 'products.p_id')

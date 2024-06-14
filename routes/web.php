@@ -7,6 +7,7 @@ use App\Http\Controllers\productscontrollers;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\usercontrollers;
 use App\Http\Controllers\CouponController;
+use App\Http\Controllers\histroycontrollers;
 use App\Http\Controllers\ordercontroller;
 use App\Http\Controllers\PayPalController;
 use Illuminate\Support\Facades\Route;
@@ -93,3 +94,4 @@ Route::post('place_order',[ordercontroller::class,'place_order']);
 
 Route::get('/payment-status', [OrderController::class, 'paymentStatus'])->name('payment.status');
 
+route::get('order_histroy',[histroycontrollers::class,'order_histroy']);
