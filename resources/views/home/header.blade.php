@@ -109,11 +109,17 @@
               <div class="col-lg-5 pr-0">
                 <ul class="nav navbar-nav navbar-right right_nav pull-right">
                   <li class="nav-item">
-                    <a href="#" class="icons">
+                    {{-- <a href="{{ url('search') }}">
+                      <input type="text" name="query" placeholder="Search products...">
                       <i class="ti-search" aria-hidden="true"></i>
-                    </a>
+                    </a> --}}
                   </li>
-
+                  <li class="nav-item">
+                  <form action="{{ route('search') }}" method="GET">
+                    <input type="text" name="query" placeholder="Search products...">
+                    <button type="submit"><i class="ti-search" aria-hidden="true"></i></button>
+                </form>
+              </li>
                   <li class="nav-item">
                     <a href="{{url('cart')}}" class="icons">
                       <i class="ti-shopping-cart"></i>

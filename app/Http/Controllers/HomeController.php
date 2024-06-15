@@ -53,4 +53,16 @@ class HomeController extends Controller
         $product = Product::find($p_id);
         return view('home.products_deatils', compact('product'));
     }
+
+    public function search(Request $request)
+    {
+        $query = $request->input('query');
+
+        // Perform the search query
+        $products = Product::where('name', 'LIKE', "%$query%")
+                        ->orWhere('description', 'LIKE', "%$query%")
+                        ->get();
+
+        return view('home.search-results', compact('products', 'query'));
+    }
 }

@@ -39,12 +39,27 @@
             </div>
           </div>
           
-                  {{-- <div class="product_count">
+                  <div class="product_count">
                    
-                  </div> --}}
+                  </div>
               </div>
           </div>
       </div>
   </div>
 
+
+  {{-- @if ($orders->isEmpty())
+  <p>No orders found.</p>
+@else
+  <ul>
+      @foreach ($orders as $order)
+          <li>
+              Order ID: {{ $order->id }}<br>
+              Quantity: {{ $order->qty }}<br>
+              Amount: {{ $order->amount }}<br>
+              <!-- Add more details as per your Order model -->
+          </li>
+      @endforeach
+  </ul>
+@endif --}}
     @include('home.footer')

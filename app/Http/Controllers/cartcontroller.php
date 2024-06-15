@@ -119,6 +119,27 @@ public function updateCart(Request $request, $itemId) {
     $product->p_quantity -= $qtyChange;
     $product->save();
 
+    $user_id = $cartItem->u_id;
+    $cartItems = Cart::where('u_id', $user_id)->get();
+    $totalQuantity = $cartItems->sum('quantity');
+    $totalPrice = $cartItems->sum(function ($item) {
+        return $item->quantity * $item->product->price;
+    });
+
+    $itemTotalPrice = $cartItem->quantity * $cartItem->product->price;
+
+    // Retrieve the discount and shipping from the session if available
+    $couponDetails = Session::get('coupon', [
+        'discount' => 0,
+        'shipping' => 0,
+    ]);
+
+    $discount = $couponDetails['discount'];
+    $shipping = $couponDetails['shipping'];
+
+    $finalTotal = $totalPrice - $discount + $shipping;
+
+
     // Calculate new totals and other necessary details
     // ... (your existing calculations for total price, discount, etc.)
 

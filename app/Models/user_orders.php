@@ -8,9 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class user_orders extends Model
 {
     use HasFactory;
-    protected $table = "order_details";
+    public $table = "user_orders";
+    public $primartyKey = "o_id";
 
-    protected $fillable = [
+    public $fillable = [
         'order_id', 'p_id', 'u_id', 'discount', 'u_quantity'
       
     ];

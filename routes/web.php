@@ -95,3 +95,5 @@ Route::post('place_order',[ordercontroller::class,'place_order']);
 Route::get('/payment-status', [OrderController::class, 'paymentStatus'])->name('payment.status');
 
 route::get('order_histroy',[histroycontrollers::class,'order_histroy']);
+
+Route::get('/search', [HomeController::class, 'search'])->name('search');
