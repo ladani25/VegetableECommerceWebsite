@@ -11,7 +11,7 @@ use App\Http\Controllers\histroycontrollers;
 use App\Http\Controllers\ordercontroller;
 use App\Http\Controllers\PayPalController;
 use Illuminate\Support\Facades\Route;
-
+use Illuminate\Support\Facades\Mail;
 // Route::get('/', function () {
 //     return view('welcome');
 // });
@@ -45,18 +45,41 @@ route::get('p_delete/{p_id}',[productscontrollers::class,'p_delete']);
 route::get('p_edit/{p_id}',[productscontrollers::class,'p_edit']);
 route::post('edit_p/{p_id}',[productscontrollers::class,'edit_p']);
 
+Route::get('products.category/{c_id}', [HomeController::class, 'showCategory'])->name('products.category');
+route::get('products.show/{p_id}',[HomeController::class,'showproducts'])->name('products.details');
 
-route::get('home',[HomeController::class,'home']);
+route::get('home',[HomeController::class,'home'])->name('home');
 route::get('shop',[HomeController::class,'shop']);
+// Route::get('/shop', [HomeController::class, 'shop'])->name('shop');
+
 route::get('contact',[HomeController::class,'contact']);
 route::get('shop_categeroy',[HomeController::class,'shop_categeroy']);
 
-route::get('register',[usercontrollers::class,'register']);
+Route::post('addreview', [HomeController::class, 'addReview'])->name('addreview');
+
+
+
+route::get('register',[usercontrollers::class,'register']); 
 route::post('user_register',[usercontrollers::class,'user_register']);
 
 
 route::get('login',[usercontrollers::class,'login']);
 route::post('user_login',[usercontrollers::class,'user_login']);
+route::get('user_profile/',[usercontrollers::class,'user_profile']);
+route::post('edit_profile/{u_id}',[usercontrollers::class,'edit_profile']);
+route::get('change_password/{u_id}', [usercontrollers::class, 'change_password'])->name('change_password');
+route::post('update_password/{u_id}', [usercontrollers::class, 'update_password'])->name('update_password');
+
+Route::get('password/reset', [usercontrollers::class, 'showLinkRequestForm'])->name('password.request');
+Route::post('password/email', [usercontrollers::class, 'sendResetLinkEmail'])->name('password.email');
+
+// routes/web.php
+
+Route::get('password/reset', [usercontrollers::class, 'showResetForm'])->name('password.reset');
+Route::post('password/reset', [usercontrollers::class, 'resetPassword']);
+Route::get('password/verify', [usercontrollers::class, 'showVerificationForm'])->name('password.verify');
+Route::post('password/verify', [usercontrollers::class, 'verifyIdentity']);
+
 
 route::get('products_details/{p_id}',[HomeController::class,'products_details']);
 route::get('user',[usercontrollers::class,'user']);
@@ -66,6 +89,7 @@ route::get('wishlists',[WishlistController::class,'index']);
 route::post('add',[WishlistController::class,'add']);
 route::post('remove/{w_id}',[WishlistController::class,'remove']);
 Route::post('/update-wishlist', [WishlistController::class, 'updateWishlist']);
+route::post('removeall-wishlist',[WishlistController::class,'removeall']);
 
 
 route::get('cart',[cartcontroller::class,'cart']);
@@ -95,5 +119,26 @@ Route::post('place_order',[ordercontroller::class,'place_order']);
 Route::get('/payment-status', [OrderController::class, 'paymentStatus'])->name('payment.status');
 
 route::get('order_histroy',[histroycontrollers::class,'order_histroy']);
+Route::get('/order-details/{id}', [histroycontrollers::class, 'orderDetails'])->name('order.details');
 
 Route::get('/search', [HomeController::class, 'search'])->name('search');
+Route::get('/filter-products-by-price', [HomeController::class, 'filterProductsByPrice'])->name('filter.products.by.price');
+
+
+
+
+// Route::get('/test-mail', function () {
+//     $details = [
+//         'title' => 'Test Mail from Laravel',
+//         'body' => 'This is a test mail.'
+//     ];
+
+//     Mail::raw('This is a test mail', function($message) {
+//         $message->to('your_test_email@example.com')
+//                 ->subject('Test Mail');
+//     });
+
+//     return 'Email Sent';
+// });
+
+

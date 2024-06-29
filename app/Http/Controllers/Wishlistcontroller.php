@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Wishlist;
 use App\Models\Product;
 use App\Models\User;
+use App\Models\Cart;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -33,7 +34,9 @@ class  Wishlistcontroller extends Controller
         // dd($wishlists);
         // $wishlists = wishlist::all();
         // dd($wishlists);
-        return view('home.wishlist', compact('wishlists'));
+        $wishlistCount = Wishlist::where('u_id', auth()->id())->count();
+        $cartCount = Cart::where('u_id', auth()->id())->count();
+        return view('home.wishlist', compact('wishlists' , 'wishlistCount' , 'cartCount'));
     }
 
     public function  add(Request $request)
@@ -52,7 +55,9 @@ class  Wishlistcontroller extends Controller
                 $wishlist->p_id = $products_id;
                 $wishlist->u_id = $user_id;
                 $wishlist->save();
-                return redirect()->back()->with('success', 'Product  added to wishlist.');
+                $wishlistCount = Wishlist::where('u_id', auth()->id())->count();
+                return redirect()->back()->with('success', 'Product added to wishlist.')->with(compact('wishlistCount'));
+
             }
             else
             {
@@ -92,6 +97,15 @@ class  Wishlistcontroller extends Controller
         session()->put('wishlist', $wishlist);
 
         return response()->json(['wishlist' => $wishlist]);
+    }
+
+    public function removeall()
+    {
+        $wishlist =  Wishlist::all();
+        foreach ( $wishlist as  $wishlistt) {
+            $wishlistt->delete();
+        }
+        return redirect()->back()->with('success', 'All products removed from  Wishlist.');
     }
 
    

@@ -33,9 +33,12 @@ class cartcontroller extends Controller
             // Calculate total quantity and total price
             $totalQuantity = $cartItems->sum('quantity');
             $totalPrice = $cartItems->sum('total_price');
+            $wishlistCount = Wishlist::where('u_id', auth()->id())->count();
+            $cartCount = Cart::where('u_id', auth()->id())->count();
+        
     
             // Pass the cart items, total quantity, and total price to the view
-            return view('home.cart', compact('cartItems', 'totalQuantity', 'totalPrice'));
+            return view('home.cart', compact('cartItems', 'totalQuantity', 'totalPrice', 'wishlistCount', 'cartCount'));
         } else {
             // Handle the case where the user is not found
             return redirect()->back()->with('error', 'User not found.');
@@ -94,69 +97,67 @@ class cartcontroller extends Controller
 
 
   // In your update-cart route handler
-public function updateCart(Request $request, $itemId) {
-    // dd($request->all());
-    $qty = $request->input('qty');
-    $couponCode = $request->input('coupon_code');
-    $productId = $request->input('product_id');
-    $qtyChange = $request->input('qty_change');
+    public function updateCart(Request $request, $itemId) 
+    {
+        // dd($request->all());
+        $qty = $request->input('qty');
+        $couponCode = $request->input('coupon_code');
+        $productId = $request->input('product_id');
+        $qtyChange = $request->input('qty_change');
 
-    // dd($qtyChange);
+        // dd($qtyChange);
 
-    // Fetch the cart item and product from the database
-    $cartItem = Cart::find($itemId);
-    $product = Product::find($productId);
+        // Fetch the cart item and product from the database
+        $cartItem = Cart::find($itemId);
+        $product = Product::find($productId);
 
-    if (!$cartItem || !$product) {
-        return response()->json(['success' => false, 'message' => 'Item or Product not found']);
+        if (!$cartItem || !$product) {
+            return response()->json(['success' => false, 'message' => 'Item or Product not found']);
+        }
+
+        // Update the cart item quantity
+        $cartItem->quantity = $qty;
+        $cartItem->save();
+
+        // Update the product quantity
+        $product->p_quantity -= $qtyChange;
+        $product->save();
+
+        $user_id = $cartItem->u_id;
+        $cartItems = Cart::where('u_id', $user_id)->get();
+        $totalQuantity = $cartItems->sum('quantity');
+        $totalPrice = $cartItems->sum(function ($item) {
+            return $item->quantity * $item->product->price;
+        });
+
+        $itemTotalPrice = $cartItem->quantity * $cartItem->product->price;
+
+        // Retrieve the discount and shipping from the session if available
+        $couponDetails = Session::get('coupon', [
+            'discount' => 0,
+            'shipping' => 0,
+        ]);
+
+        $discount = $couponDetails['discount'];
+        $shipping = $couponDetails['shipping'];
+
+        $finalTotal = $totalPrice - $discount + $shipping;
+
+
+        // Calculate new totals and other necessary details
+        // ... (your existing calculations for total price, discount, etc.)
+
+        return response()->json([
+            'success' => true,
+            'itemTotalPrice' => $itemTotalPrice,
+            'totalQuantity' => $totalQuantity,
+            'totalPrice' => $totalPrice,
+            'discount' => $discount,
+            'shipping' => $shipping,
+            'finalTotal' => $finalTotal,
+            'productQuantity' => $product->quantity
+        ]);
     }
-
-    // Update the cart item quantity
-    $cartItem->quantity = $qty;
-    $cartItem->save();
-
-    // Update the product quantity
-    $product->p_quantity -= $qtyChange;
-    $product->save();
-
-    $user_id = $cartItem->u_id;
-    $cartItems = Cart::where('u_id', $user_id)->get();
-    $totalQuantity = $cartItems->sum('quantity');
-    $totalPrice = $cartItems->sum(function ($item) {
-        return $item->quantity * $item->product->price;
-    });
-
-    $itemTotalPrice = $cartItem->quantity * $cartItem->product->price;
-
-    // Retrieve the discount and shipping from the session if available
-    $couponDetails = Session::get('coupon', [
-        'discount' => 0,
-        'shipping' => 0,
-    ]);
-
-    $discount = $couponDetails['discount'];
-    $shipping = $couponDetails['shipping'];
-
-    $finalTotal = $totalPrice - $discount + $shipping;
-
-
-    // Calculate new totals and other necessary details
-    // ... (your existing calculations for total price, discount, etc.)
-
-    return response()->json([
-        'success' => true,
-        'itemTotalPrice' => $itemTotalPrice,
-        'totalQuantity' => $totalQuantity,
-        'totalPrice' => $totalPrice,
-        'discount' => $discount,
-        'shipping' => $shipping,
-        'finalTotal' => $finalTotal,
-        'productQuantity' => $product->quantity
-    ]);
-}
-
-    
-
 
 // public function updateCart(Request $request, $itemId)
 // {

@@ -26,12 +26,14 @@
                 <div class="card-body">
                 <h5>Order Date: {{ $orderDetail->order_date }}
                   <p class="card-text"><h5>Order Id: {{ $orderDetail->order_id }}
+                  <p class="card-text"><h5>Order NUMBER: {{ $orderDetail->order_num }}
                   <p class="card-text"><h5>Price: ${{ $orderDetail->totalal_amout }}
                   <p class="card-text"><h5>Payment Method: {{ $orderDetail->payment_type }}
                   <p class="card-text"><h5>Status: {{ $orderDetail->payment_status }}
                   <div>
                  <form>
-                    <button class="btn btn-primary">Read More</button>
+                    {{-- <button class="btn btn-primary">Read More</button> --}}
+                    <a href="{{ url('order-details', $orderDetail->id) }}" class="btn btn-primary">Read More</a>
                  </form>
                   </div>
                 </div>

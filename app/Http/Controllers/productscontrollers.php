@@ -11,14 +11,6 @@ class productscontrollers extends Controller
    
     public function get_products(Request $request)
     {
-        // Validate the request data
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric',
-            'quantity' => 'required|integer',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048', // Validate each uploaded image
-        ]);
-    
         if ($request->hasFile('images')) {
             $file = $request->file('images');
             $extension = $file->getClientOriginalExtension();
@@ -42,6 +34,12 @@ class productscontrollers extends Controller
         // Retrieve all products from the database
         $products = Product::all();
     
+  
+        $products= session('products', [
+            // 'amount' =>  $totalPrice
+            'products' => 'p_id'
+         ]);
+
         // Pass products to the view
         return view('admin.products', compact('products'));
     }
@@ -110,6 +108,7 @@ public function edit_p(Request $request, $p_id)
         $file->move('images', $filename);
     }
 
+    // dd($request->all());
     $product = Product::find($p_id);
     $product->name = $request->name;
     $product->images = $filename; // Use the initialized value

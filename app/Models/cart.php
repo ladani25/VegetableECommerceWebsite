@@ -27,4 +27,9 @@ class cart extends Model
     {
         return $this->belongsTo(Product::class, 'p_id'); // Assuming 'p_id' is the foreign key
     }
+
+    public function products()
+{
+    return $this->hasMany(Product::class , 'p_id');
+}
 }

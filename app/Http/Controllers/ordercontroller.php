@@ -51,13 +51,11 @@ class OrderController extends Controller
         $totalPrice =  $order['amount'];
         $finalPrice =$totalPrice - $discount + $shipping;
 
-        
-        $order = session('order', [
-            'amount' =>  $totalPrice
-         ]);
+        $orderId = $order->order_id;
 
         $orderDetails = new order_deatils();
-        $orderDetails->order_id = '#' . strtoupper(uniqid());
+        $orderDetails->order_id = $order->order_id;
+        $orderDetails->order_num = '#' . strtoupper(uniqid());
         $orderDetails->totalal_amout = $finalPrice;
         $orderDetails->sub_totale = $totalPrice;
         $orderDetails->discount = $discount;

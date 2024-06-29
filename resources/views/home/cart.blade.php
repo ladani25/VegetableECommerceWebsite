@@ -45,7 +45,7 @@
                                 </td>
                                 <td>
                                     <div class="d-flex">
-                                        <img src="{{ url('images/' . $item->images) }}" alt="{{ $item->name }}" style="width: 100px;">
+                                        <img src="{{ url('images/' . $item->images) }}" alt="{{ $item->name }}" style="width: 50px;">
                                     </div>
                                 </td>
                                 <td>
@@ -72,7 +72,7 @@
                                 <td>
                                     <form action="{{ url('removecart', $item->id) }}" method="POST">
                                         @csrf
-                                        <button type="submit" class="btn btn-danger mt-2">Remove</button>
+                                        <button type="submit" class="btn btn-danger mt-2"><i class="fa fa-trash" aria-hidden="true"></i></button>
                                     </form>
                                 </td>
                             </tr>

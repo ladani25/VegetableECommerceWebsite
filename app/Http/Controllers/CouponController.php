@@ -7,7 +7,9 @@ use App\Models\Cart;
 use App\Models\order;
 use App\Models\User;
 use App\Models\Product;
+use App\Models\wishlist;
 use App\Models\user_orders;
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
@@ -60,11 +62,15 @@ class CouponController extends Controller
 
     public function checkout(Request $request)
     {
-        // dd($request->all());
-        $cartItems = Cart::where('u_id', session('u_id'))->get();
+    //     // Retrieve cart items for the user
+    //     // dd($request->all());dd()
+        // dd(session('email'));
+        $user = User::where('email', session('email'))->first();
+        $user_id = $user->u_id;
+        $cartItems = Cart::where('u_id', $user_id)->get();
         // dd($cartItems);
         if ($cartItems->isEmpty()) {
-            // return redirect()->route('home')->with('error', 'Your cart is empty.');
+            return redirect()->route('home')->with('error', 'Your cart is empty.');
         }
         $totalQuantity = $cartItems->sum('quantity');
         $totalPrice = $cartItems->sum(function ($item) {
@@ -96,97 +102,97 @@ class CouponController extends Controller
     
         // Save data to orders table
         $orderId = $order->id;
-    
+        // dd($orderId);
         // Save data to user_orders table
-        foreach ($cartItems as $item) {
-            $userOrder = new user_orders();
-            $userOrder->order_id = $orderId; 
-            $userOrder->p_id = $item->p_id;
-            $userOrder->u_id = $item->u_id;
-            $userOrder->u_quantity = $item->quantity;
-            $userOrder->save();
-        }
-    
+          foreach ($cartItems as $item) {
+                
+                $userOrder = new user_orders();
+                $userOrder->order_id = $order->id; // Use the ID of the saved order
+                $userOrder->u_id = $user->u_id;
+                $userOrder->p_id = $item->p_id;
+                $userOrder->u_qty = $item->quantity;
+                $userOrder->save();
+            }
+
+ 
         Session::put('order', [
             'amount' => $totalPrice
         ]);
-        return view('home.checkout', compact('cartItems',  'shipping', 'totalQuantity', 'totalPrice', 'discount', 'finalPrice'));
+
+        $wishlistCount = Wishlist::where('u_id', auth()->id())->count();
+        $cartCount = Cart::where('u_id', auth()->id())->count();
+        return view('home.checkout', compact('cartItems',  'shipping', 'totalQuantity', 'totalPrice', 'discount', 'finalPrice', 'wishlistCount', 'cartCount'));
     }
 
 
-    
     // public function checkout(Request $request)
     // {
-    //     // dd($request->all());
-    //     $cartItems = Cart::where('u_id', session('u_id'))->get();
-
+    //     // Retrieve cart items for the user
+    //     // dd($request->all());dd()
+    //     // dd(session('email'));
+    //     $user = User::where('email', session('email'))->first();
+    //     $user_id = $user->u_id;
+    //     $cartItems = Cart::where('u_id', $user_id)->get();
+    //     // dd($cartItems);
     //     if ($cartItems->isEmpty()) {
-    //         // return redirect()->route('home')->with('error', 'Your cart is empty.');
+    //         return redirect()->route('home')->with('error', 'Your cart is empty.');
     //     }
+
+    //     // Calculate total quantity and total price
     //     $totalQuantity = $cartItems->sum('quantity');
     //     $totalPrice = $cartItems->sum(function ($item) {
     //         return $item->quantity * $item->price;
     //     });
+
+    //     // Retrieve coupon data from session
     //     $coupon = session('coupon', [
     //         'discount' => 0,
     //         'shipping' => 0
     //     ]);
+
     //     $discount = $coupon['discount'];
     //     $shipping = $coupon['shipping'];
     //     $finalPrice = $totalPrice - $discount + $shipping;
-    //     // Optionally, save order items or any other order-related data here
+
+    //     // Retrieve the authenticated user
     //     $user = auth()->user();
-    //     $totalQuantity = $request->input('totalQuantity');
-    //     $totalPrice = $request->input('totalPrice');
+    //     if (!$user) {
+    //         return redirect()->route('login')->with('error', 'You need to login first.');
+    //     }
 
-
-    //     $user = User::where('email', session('email'))->first();
-    //     $user_id = $user->u_id;
-
-    //         // Retrieve the user's ID
     //     // Create the order
-    //     $order = new order();
+    //     $order = new Order();
     //     $order->u_id = $user->u_id;
     //     $order->qty = $totalQuantity;
-    //     $order->amount = $totalPrice;
+    //     $order->amount = $totalPrice; // Use the final price
     //     $order->save();
+    //     // dd($cartItems);
+    //         // Save each cart item as an order item
+    //         foreach ($cartItems as $item) {
+                
+    //             $userOrder = new user_orders();
+    //             $userOrder->order_id = $order->id; // Use the ID of the saved order
+    //             $userOrder->u_id = $user->u_id;
+    //             $userOrder->p_id = $item->p_id;
+    //             $userOrder->u_qty = $item->quantity;
+    //             $userOrder->save();
+    //         }
 
-    //     // $this->updateProductQuantities($request->id);
-    //     // $this->updateProductQuantities($order->id);
 
-    //     foreach ($cartItems as $item) {
-    //                 $userOrder = new user_orders();
-    //                 $userOrder->order_id = $order->id; // Assuming order_id is the foreign key in user_orders table
-    //                 $userOrder->p_id = $item->p_id;
-    //                 $userOrder->u_id = $item->u_id;
-    //                 $userOrder->u_quantity = $item->quantity;
-    //                 $userOrder->save();
-    //             }
+    //         // Clear the cart after checkout
+    //         Cart::where('u_id', $user->u_id)->delete();
 
-    //    Session::put('order', [
-    //        'amount' => $totalPrice
-    //    ]);
-    //     return view('home.checkout', compact('cartItems', 'totalPrice', 'discount', 'shipping', 'finalPrice'));
+    //         // Retrieve wishlist and cart count
+    //         $wishlistCount = Wishlist::where('u_id', $user->u_id)->count();
+    //         $cartCount = Cart::where('u_id', $user->u_id)->count();
+
+    //         // Return the checkout view with necessary data
+    //         return view('home.checkout', compact('cartItems', 'totalPrice', 'discount', 'shipping', 'finalPrice', 'wishlistCount', 'cartCount'));
     // }
 
 
-    public function user_orders()
-    {
-        $user = User::where('email', session('email'))->first();
-        $user_id = $user->u_id;
-        $orders = order::where('u_id', $user->u_id)->get();
-        $order_id  =  $orders->order_id;
-
-        $product = product::where('p_id', $orders->p_id)->get();
-        
-
-        $user_orders  = new user_orders();
-        $user_orders = user_orders::where('order_id', $order_id)->get();
-        $user_orders->u_id = $user->u_id;
-        $user_orders->order_id = $order_id;
-        $user_orders->p_id = $orders->p_id; 
-        $user_orders->u_quantity = $orders->u_quantity;
-        $user_orders->save();
-        return view('home.checkout', compact('orders'));
-    }
 }
+
+    
+
+

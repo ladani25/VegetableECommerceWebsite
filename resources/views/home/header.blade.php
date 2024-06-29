@@ -24,6 +24,30 @@
   <link rel="stylesheet" href="{{url('front-end/css/style.css')}}" />
   <link rel="stylesheet" href="{{url('front-end/css/responsive.css')}}" />
 
+<style>
+  .tip
+  {
+    border-bottom-style solid
+border-bottom-width 0px
+border-left-style solid
+border-left-width 0px
+border-right-style solid
+border-right-width 0px
+border-top-style solid
+border-top-width 0px
+box-sizing border-box
+color rgb(0, 0, 0)
+cursor pointer
+d path("M 0 0 H 24 V 24 H 0 Z")
+display inline
+fill rgb(255, 255, 255)
+font-family ProximaNova, Helvetica, Arial, sans-serif
+font-size 16px
+font-weight 400
+height auto
+transform-origin 0px 0px
+  }
+  </style>
   
 </head>
 
@@ -54,18 +78,18 @@
                   <li class="nav-item ">
                     <a class="nav-link" href="{{url('shop')}}">Shop</a>
                   </li>
-                  <li class="nav-item submenu dropdown">
-                    <a href="{{url('shop')}}" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                      aria-expanded="false">Shop Category</a>
-                    <ul class="dropdown-menu">
+                  {{-- <li class="nav-item submenu dropdown"> --}}
+                    {{-- <a href="{{ url('shop_categeroy') }}" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                      aria-expanded="false">Shop Category</a> --}}
+                    {{-- <ul class="dropdown-menu"> --}}
                       {{-- @foreach ($categories as $category)
                       <li>
-                          <a href="#">{{ $category->c_name }}</a>
+                          <a href="{{url('products.category', ['c_id' => $category->c_id]) }}">{{ $category->c_name }}</a>
                       </li>
                       @endforeach --}}
                     
                       {{-- <li class="nav-item">
-                        <a class="nav-link" href="{{url('shop_categeroy')}}">Shop Category</a>
+                        <a class="nav-link" href="{{url('shop_categeroy')}}">Shop Category</a>   
                       </li> --}}
                       
                       {{-- <li class="nav-item">
@@ -74,8 +98,8 @@
                       <li class="nav-item">
                         <a class="nav-link" href="cart.html">Shopping Cart</a>
                       </li> --}}
-                    </ul>
-                  </li>
+                    {{-- </ul> --}}
+                  {{-- </li> --}}
                   {{-- <li class="nav-item submenu dropdown">
                     <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
                       aria-expanded="false">Blog</a>
@@ -108,23 +132,30 @@
 
               <div class="col-lg-5 pr-0">
                 <ul class="nav navbar-nav navbar-right right_nav pull-right">
-                  <li class="nav-item">
-                    {{-- <a href="{{ url('search') }}">
+                  {{-- <li class="nav-item">
+                    <a href="{{ url('search') }}">
                       <input type="text" name="query" placeholder="Search products...">
                       <i class="ti-search" aria-hidden="true"></i>
-                    </a> --}}
-                  </li>
+                    </a>
+                  </li> --}}
                   <li class="nav-item">
-                  <form action="{{ route('search') }}" method="GET">
-                    <input type="text" name="query" placeholder="Search products...">
+                  <form action="{{ route('search') }}" method="GET"  id="search-form">
+                    {{-- <input type="text" name="query" placeholder="Search products..."> --}}
+                    <input type="text" name="query" id="search-query"  placeholder="Search for products...">
                     <button type="submit"><i class="ti-search" aria-hidden="true"></i></button>
                 </form>
               </li>
+              <div class="tip">
                   <li class="nav-item">
                     <a href="{{url('cart')}}" class="icons">
+                     
                       <i class="ti-shopping-cart"></i>
+                      @if ($cartCount > 0)
+                      <span class="badge badge-pill badge-primary">{{ $cartCount }}</span>
+                  @endif
                     </a>
                   </li>
+              </div>
 
                   <li class="nav-item submenu dropdown">
                     <a href="#" class="icons">
@@ -138,18 +169,25 @@
                           <a class="nav-link" href="{{url('login')}}">Login</a>
                         </li>
                         <li class="nav-item">
+                          <a class="nav-link" href="{{url('user_profile')}}"> user_profile</a>
+                        </li>
+                        <li class="nav-item">
                           <a class="nav-link" href="{{url('order_histroy')}}">order_histroy</a>
                         </li>
                       </ul>
                   </li>
-
-                  <li class="nav-item">
-                    {{-- <form action="{{url('add-whitelist')}}" method="post">
-                      @csrf --}}
+                  {{-- user_profile --}}
+                  <li class="nav-item" >
+                   
                     <a href="{{url('wishlists')}}" class="icons">
-                      <i class="ti-heart" aria-hidden="true"></i>
+                      <i class="ti-heart" aria-hidden="true">
+                      @if ($wishlistCount > 0)
+                      <span class="badge badge-pill badge-primary">{{ $wishlistCount }}</span>
+                  @endif
+                </i>
+                      </div>
                     </a>
-                    {{-- </form> --}}
+                    
                   </li>
                 </ul>
               </div>
@@ -159,3 +197,59 @@
       </div>
     </div>
   </header>
+
+  <script>
+    $(document).ready(function() {
+        $('#search-form').on('submit', function(e) {
+            e.preventDefault();
+
+            let query = $('#search-query').val();
+
+            $.ajax({
+                url: '{{ route("search") }}',
+                method: 'GET',
+                data: {
+                    query: query
+                },
+                success: function(response) {
+                    $('#search-results').html('');
+
+                    if (response.products.data.length > 0) {
+                        let productsHtml = '<div class="row">';
+                        response.products.data.forEach(function(product) {
+                            productsHtml += `
+                                <div class="col-md-4">
+                                    <div class="card mb-4">
+                                        <img class="card-img-top" src="${product.image_url}" alt="${product.name}">
+                                        <div class="card-body">
+                                            <h5 class="card-title">${product.name}</h5>
+                                            <p class="card-text">${product.description}</p>
+                                            <p class="card-text">Rs ${product.price}</p>
+                                            <a href="/product/${product.id}" class="btn btn-primary">View Details</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        productsHtml += '</div>';
+                        productsHtml += response.pagination;
+
+                        $('#search-results').html(productsHtml);
+                    } else {
+                        $('#search-results').html('<p>No products found matching your query.</p>');
+                    }
+
+                    $('#search-results').append(`
+                        <div>
+                            <p>Wishlist Items: ${response.wishlistCount}</p>
+                            <p>Cart Items: ${response.cartCount}</p>
+                        </div>
+                    `);
+                },
+                error: function() {
+                    $('#search-results').html('<p>An error occurred. Please try again.</p>');
+                }
+            });
+        });
+    });
+</script>

@@ -10,17 +10,21 @@ class Product extends Model
     use HasFactory;
     protected $table = 'products';
     protected $primaryKey = "p_id";
+    protected $foragain = "c_id";
 
     public function images()
     {
         return $this->hasMany(Image::class);
     }
     
-    public function category()
+//     public function category()
+// {
+//     return $this->belongsTo(Category::class,'c_id','c_id');
+// }
+public function category()
 {
-    return $this->belongsTo(Category::class,'c_id','c_id');
+    return $this->belongsTo(Category::class ,'c_id','c_id');
 }
-
 // public function wishlists()
 // {
 //     return $this->hasMany(Wishlist::class);

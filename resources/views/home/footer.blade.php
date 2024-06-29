@@ -1,6 +1,7 @@
  <!--================ start footer Area  =================-->
- <footer class="footer-area ">
-    <div class="container">
+ <div style="margin-top: 30%">
+ <footer class="footer-area "   style="padding-top:0%;">
+    <div class="container" style="align: center">
       <div class="row">
         {{-- <div class="col-lg-2 col-md-6 single-footer-widget">
           <h4>Show Categeroy</h4>
@@ -89,3 +90,4 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
   <script src="{{url('front-end/vendors/counter-up/jquery.counterup.js')}}"></script>
   <script src="{{url('front-end/js/mail-script.js')}}"></script>
   <script src="{{url('front-end/js/theme.js')}}"></script>
+ </div>

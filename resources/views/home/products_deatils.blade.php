@@ -1,784 +1,282 @@
 @include('home.header')
-    <!--================Single Product Area =================-->
-    {{-- <div class="product_image_area">
-      <div class="container">
-        <div class="row s_product_inner">
-          <div class="col-lg-6">
-            <div class="s_product_img">
-              <div
-                id="carouselExampleIndicators"
-                class="carousel slide"
-                data-ride="carousel">
+
+<style>
+    .heart-red {
+        color: red;
+    }
+
+    .product {
+        display: flex;
+        align-items: center;
+        margin: 10px 0;
+    }
+
+    .heart {
+        cursor: pointer;
+        font-size: 24px;
+        margin-left: 10px;
+    }
+
+    .heart.red {
+        color: red;
+    }
+
+    .reviews {
+        margin-top: 30px;
+    }
+
+    .review-form {
+        margin-top: 20px;
+    }
+
+    .review-form input,
+    .review-form textarea {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .review-list {
+        margin-top: 20px;
+    }
+
+    .review-item {
+        margin-bottom: 10px;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 10px;
+    }
+
+    .star-rating {
+        font-size: 24px;
+        color:#ddd;
+    }
+
+    .star-rating input[type="radio"] {
+        display: none;
+    }
+
+    .star-rating label {
+        cursor: pointer;
+    }
+
+    .star-rating input[type="radio"]:checked~label,
+    .star-rating input[type="radio"]:hover~label {
+        color: #ffb400;
+    }
+</style>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-6">
+            <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
                 <ol class="carousel-indicators">
-                  <li
-                    data-target="#carouselExampleIndicators"
-                    data-slide-to="0"
-                    class="active">
-                    <img
-                      src="{{url('front-end/img/product/single-product/s-product-s-2.jpg')}}"
-                      alt=""
-                    />
-                  </li>
-                  <li
-                    data-target="#carouselExampleIndicators"
-                    data-slide-to="1"
-                  >
-                    <img
-                      src="{{url('front-end/img/product/single-product/s-product-s-3.jpg')}}"
-                      alt=""
-                    />
-                  </li>
-                  <li
-                    data-target="#carouselExampleIndicators"
-                    data-slide-to="2"
-                  >
-                    <img
-                      src="{{url('front-end/img/product/single-product/s-product-s-4.jpg')}}"
-                      alt=""
-                    />
-                  </li>
+                    <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active">
+                        <img src="{{url('front-end/img/product/single-product/s-product-s-2.jpg')}}" alt="" />
+                    </li>
+                    <!-- Add more carousel indicators if needed -->
                 </ol>
                 <div class="carousel-inner">
-                  <div class="carousel-item active">
-                    <img
-                      class="d-block w-100"
-                      src="{{url('front-end/img/product/single-product/s-product-1.jpg')}}"
-                      alt="First slide"
-                    />
-                  </div>
-                  <div class="carousel-item">
-                    <img
-                      class="d-block w-100"
-                      src="img/product/single-product/s-product-1.jpg"
-                      alt="Second slide"
-                    />
-                  </div>
-                  <div class="carousel-item">
-                    <img
-                      class="d-block w-100"
-                      src="img/product/single-product/s-product-1.jpg"
-                      alt="Third slide"
-                    />
-                  </div>
+                    <div class="carousel-item active">
+                        {{-- <img class="d-block w-100" src="{{url('front-end/img/product/single-product/s-product-1.jpg')}}" alt="First slide"> --}}
+                        <img class="d-block w-100" src="{{ url('images/' . $product->images) }}"
+                            alt="First slide">
+                    </div>
+                    <!-- Add more carousel items if needed -->
                 </div>
-              </div>
+                <!-- Add carousel controls if needed -->
             </div>
-          </div>
-          <div class="col-lg-5 offset-lg-1">
-            <div class="s_product_text">
-              <h3>Faded SkyBlu Denim Jeans</h3>
-              <h2>$149.99</h2>
-              <ul class="list">
-                <li>
-                  <a class="active" href="#">
-                    <span>Category</span> : Household</a
-                  >
-                </li>
-                <li>
-                  <a href="#"> <span>Availibility</span> : In Stock</a>
-                </li>
-              </ul>
-              <p>
-                Mill Oil is an innovative oil filled radiator with the most
-                modern technology. If you are looking for something that can
-                make your interior look awesome, and at the same time give you
-                the pleasant warm feeling during the winter.
-              </p>
-              <div class="product_count">
-                <label for="qty">Quantity:</label>
-                <input
-                  type="text"
-                  name="qty"
-                  id="sst"
-                  maxlength="12"
-                  value="1"
-                  title="Quantity:"
-                  class="input-text qty"
-                />
-                <button
-                  onclick="var result = document.getElementById('sst'); var sst = result.value; if( !isNaN( sst )) result.value++;return false;"
-                  class="increase items-count"
-                  type="button"
-                >
-                  <i class="lnr lnr-chevron-up"></i>
-                </button>
-                <button
-                  onclick="var result = document.getElementById('sst'); var sst = result.value; if( !isNaN( sst ) &amp;&amp; sst > 0 ) result.value--;return false;"
-                  class="reduced items-count"
-                  type="button"
-                >
-                  <i class="lnr lnr-chevron-down"></i>
-                </button>
-              </div>
-              <div class="card_area">
-                <a class="main_btn" href="#">Add to Cart</a>
-                <a class="icon_btn" href="#">
-                  <i class="lnr lnr lnr-diamond"></i>
-                </a>
-                <a class="icon_btn" href="#">
-                  <i class="lnr lnr lnr-heart"></i>
-                </a>
-              </div>
-            </div>
-          </div>
         </div>
-      </div>
-    </div> --}}
+        <div class="col-lg-6">
+            <div class="s_product_text">
 
-
-    <div class="container">
-      <div class="row">
-          <div class="col-lg-6">
-              <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
-                  <ol class="carousel-indicators">
-                      <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active">
-                          <img src="{{url('front-end/img/product/single-product/s-product-s-2.jpg')}}" alt="" />
-                      </li>
-                      <!-- Add more carousel indicators if needed -->
-                  </ol>
-                  <div class="carousel-inner">
-                      <div class="carousel-item active">
-                          {{-- <img class="d-block w-100" src="{{url('front-end/img/product/single-product/s-product-1.jpg')}}" alt="First slide"> --}}
-                          <img class="d-block w-100"  src="{{ url('images/' . $product->images) }}" alt="First slide">
-                      </div>
-                      <!-- Add more carousel items if needed -->
-                  </div>
-                  <!-- Add carousel controls if needed -->
-              </div>
-          </div>
-          <div class="col-lg-6">
-              <div class="s_product_text">
-                  {{-- <h3>{{ $product->name }}</h3>
-                  <h2>$ {{ $product->price }}</h2>
-                  <ul class="list">
-                      <!-- Add product details like category, availability, etc. -->
-                  </ul>
-                  <p>{{!! $product->description!! }}</p> --}}
-                  <div class="card-body">
-                    <h5 class="card-title">{{ $product->name }}</h5>
-                    <p class="card-text">Price: ${{ $product->price }}</p>
-                    <p class="card-text">Description: {{!! $product->description !!}}</p>
-                    <!-- Add more details as needed -->
-                </div>
-                  <div class="product_count">
-                      <label for="qty">Quantity:</label>
-                      <input type="text" name="qty" id="sst" maxlength="12" value="1" title="Quantity:" class="input-text qty">
-                      <button onclick="var result = document.getElementById('sst'); var sst = result.value; if( !isNaN( sst )) result.value++;return false;" class="increase items-count" type="button">
-                          <i class="lnr lnr-chevron-up"></i>
-                      </button>
-                      <button onclick="var result = document.getElementById('sst'); var sst = result.value; if( !isNaN( sst ) &amp;&amp; sst > 0 ) result.value--;return false;" class="reduced items-count" type="button">
-                          <i class="lnr lnr-chevron-down"></i>
-                      </button>
-                  </div>
-                  <div class="card_area">
-                      <a class="main_btn" href="#">Add to Cart</a>
-                      <a class="icon_btn" href="#">
-                          <i class="lnr lnr-diamond"></i>
-                      </a>
-                      <a class="icon_btn" href="#">
-                          <i class="lnr lnr-heart"></i>
-                      </a>
-                  </div>
-              </div>
-          </div>
-      </div>
-  </div>
-  
-    {{-- <div class="container">
-      <div class="row">
-          <div class="col-md-8 offset-md-2">
-              <div class="card">
-                  <div class="card-header">
-                      Product Details
-                  </div>
-                  <div class="card-body">
-                      <h5 class="card-title">{{ $product->name }}</h5>
-                      <p class="card-text">Price: ${{ $product->price }}</p>
-                      <p class="card-text">Description: {{ $product->description }}</p>
-                      <!-- Add more details as needed -->
-                  </div>
-              </div>
-          </div>
-      </div>
-  </div> --}}
-  {{-- <div class="container">
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
-            <div class="card">
-                <div class="card-header">
-                    Product Details
-                </div>
                 <div class="card-body">
                     <h5 class="card-title">{{ $product->name }}</h5>
                     <p class="card-text">Price: ${{ $product->price }}</p>
-                    <p class="card-text">Description: {{!! $product->description !!}}</p>
+                    <p class="card-text">Description: {!! $product->description !!}</p>
                     <!-- Add more details as needed -->
+                </div>
+
+                <div class="card_area">
+
+                    <form action="{{ url('addcart') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="product_id" value="{{ $product->p_id }}">
+                        <button type="submit" class="main_btn"><i class="ti-shopping-cart"></i></button>
+                    </form>
+                    <a class="icon_btn" href="#">
+                        <i class="lnr lnr-diamond"></i>
+                    </a>
+                    {{-- <a class="icon_btn" href="#">
+                          <i class="lnr lnr-heart"></i>
+                      </a> --}}
+                    <form action="{{ url('add') }}" method="POST" class="add-to-wishlist-form"
+                        data-product-id="{{ $product->p_id }}">
+                        @csrf
+                        <input type="hidden" name="product_id" value="{{ $product->p_id }}">
+                        <button type="submit">
+                            <i class="ti-heart heart-icon {{ in_array($product->p_id, $wishlist) ? 'heart-red' : '' }}"></i>
+                        </button>
+                    </form>
+
+                    <div class="reviews">
+                        <h3>Customer Reviews</h3>
+                        <div class="review-list">
+                            @if ($reviews && count($reviews) > 0)
+                                @foreach ($reviews as $review)
+                                    <div class="review-item">
+                                        <div class="star-rating">
+                                            @for ($i = 1; $i <= 5; $i++)
+                                                <span class="fa fa-star{{ $i <= $review->rating ? '' : '-o' }}"></span>
+                                            @endfor
+                                        </div>
+                                        <p>{{ $review->comment }}</p>
+                                        <small>by {{ $review->user->name }}
+                                            on {{ $review->created_at->format('d M Y') }}</small>
+                                    </div>
+                                @endforeach
+                            @else
+                                <p>No reviews yet.</p>
+                            @endif
+                        </div>
+
+                        <div class="review-form">
+                            <h4>Add a Review</h4>
+                            <form action="{{ url('addreview') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="product_id" value="{{ $product->p_id }}">
+                                <div class="star-rating">
+                                    <input type="radio" name="rating" value="5" id="5-stars">
+                                    <label for="5-stars" class="fa fa-star"></label>
+                                    <input type="radio" name="rating" value="4" id="4-stars">
+                                    <label for="4-stars" class="fa fa-star"></label>
+                                    <input type="radio" name="rating" value="3" id="3-stars">
+                                    <label for="3-stars" class="fa fa-star"></label>
+                                    <input type="radio" name="rating" value="2" id="2-stars">
+                                    <label for="2-stars" class="fa fa-star"></label>
+                                    <input type="radio" name="rating" value="1" id="1-star">
+                                    <label for="1-star" class="fa fa-star"></label>
+                                </div>
+                                
+                                <textarea name="comment" placeholder="Write your review here..."
+                                    required></textarea>
+                                <button type="submit" class="main_btn">Submit Review</button>
+                            </form>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
     </div>
-</div> --}}
-    
-    <!--================End Single Product Area =================-->
+</div>
 
-    <!--================Product Description Area =================-->
-    {{-- <section class="product_description_area">
-      <div class="container">
-        <ul class="nav nav-tabs" id="myTab" role="tablist">
-          <li class="nav-item">
-            <a
-              class="nav-link"
-              id="home-tab"
-              data-toggle="tab"
-              href="#home"
-              role="tab"
-              aria-controls="home"
-              aria-selected="true"
-              >Description</a
-            >
-          </li>
-          <li class="nav-item">
-            <a
-              class="nav-link"
-              id="profile-tab"
-              data-toggle="tab"
-              href="#profile"
-              role="tab"
-              aria-controls="profile"
-              aria-selected="false"
-              >Specification</a
-            >
-          </li>
-          <li class="nav-item">
-            <a
-              class="nav-link"
-              id="contact-tab"
-              data-toggle="tab"
-              href="#contact"
-              role="tab"
-              aria-controls="contact"
-              aria-selected="false"
-              >Comments</a
-            >
-          </li>
-          <li class="nav-item">
-            <a
-              class="nav-link active"
-              id="review-tab"
-              data-toggle="tab"
-              href="#review"
-              role="tab"
-              aria-controls="review"
-              aria-selected="false"
-              >Reviews</a
-            >
-          </li>
-        </ul>
-        <div class="tab-content" id="myTabContent">
-          <div
-            class="tab-pane fade"
-            id="home"
-            role="tabpanel"
-            aria-labelledby="home-tab"
-          >
-            <p>
-              Beryl Cook is one of Britain’s most talented and amusing artists
-              .Beryl’s pictures feature women of all shapes and sizes enjoying
-              themselves .Born between the two world wars, Beryl Cook eventually
-              left Kendrick School in Reading at the age of 15, where she went
-              to secretarial school and then into an insurance office. After
-              moving to London and then Hampton, she eventually married her next
-              door neighbour from Reading, John Cook. He was an officer in the
-              Merchant Navy and after he left the sea in 1956, they bought a pub
-              for a year before John took a job in Southern Rhodesia with a
-              motor company. Beryl bought their young son a box of watercolours,
-              and when showing him how to use it, she decided that she herself
-              quite enjoyed painting. John subsequently bought her a child’s
-              painting set for her birthday and it was with this that she
-              produced her first significant work, a half-length portrait of a
-              dark-skinned lady with a vacant expression and large drooping
-              breasts. It was aptly named ‘Hangover’ by Beryl’s husband and
-            </p>
-            <p>
-              It is often frustrating to attempt to plan meals that are designed
-              for one. Despite this fact, we are seeing more and more recipe
-              books and Internet websites that are dedicated to the act of
-              cooking for one. Divorce and the death of spouses or grown
-              children leaving for college are all reasons that someone
-              accustomed to cooking for more than one would suddenly need to
-              learn how to adjust all the cooking practices utilized before into
-              a streamlined plan of cooking that is more efficient for one
-              person creating less
-            </p>
-          </div>
-          <div
-            class="tab-pane fade"
-            id="profile"
-            role="tabpanel"
-            aria-labelledby="profile-tab"
-          >
-            <div class="table-responsive">
-              <table class="table">
-                <tbody>
-                  <tr>
-                    <td>
-                      <h5>Width</h5>
-                    </td>
-                    <td>
-                      <h5>128mm</h5>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <h5>Height</h5>
-                    </td>
-                    <td>
-                      <h5>508mm</h5>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <h5>Depth</h5>
-                    </td>
-                    <td>
-                      <h5>85mm</h5>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <h5>Weight</h5>
-                    </td>
-                    <td>
-                      <h5>52gm</h5>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <h5>Quality checking</h5>
-                    </td>
-                    <td>
-                      <h5>yes</h5>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <h5>Freshness Duration</h5>
-                    </td>
-                    <td>
-                      <h5>03days</h5>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <h5>When packeting</h5>
-                    </td>
-                    <td>
-                      <h5>Without touch of hand</h5>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <h5>Each Box contains</h5>
-                    </td>
-                    <td>
-                      <h5>60pcs</h5>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div
-            class="tab-pane fade"
-            id="contact"
-            role="tabpanel"
-            aria-labelledby="contact-tab"
-          >
-            <div class="row">
-              <div class="col-lg-6">
-                <div class="comment_list">
-                  <div class="review_item">
-                    <div class="media">
-                      <div class="d-flex">
-                        <img
-                          src="img/product/single-product/review-1.png"
-                          alt=""
-                        />
-                      </div>
-                      <div class="media-body">
-                        <h4>Blake Ruiz</h4>
-                        <h5>12th Feb, 2017 at 05:56 pm</h5>
-                        <a class="reply_btn" href="#">Reply</a>
-                      </div>
-                    </div>
-                    <p>
-                      Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-                      sed do eiusmod tempor incididunt ut labore et dolore magna
-                      aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-                      ullamco laboris nisi ut aliquip ex ea commodo
-                    </p>
-                  </div>
-                  <div class="review_item reply">
-                    <div class="media">
-                      <div class="d-flex">
-                        <img
-                          src="img/product/single-product/review-2.png"
-                          alt=""
-                        />
-                      </div>
-                      <div class="media-body">
-                        <h4>Blake Ruiz</h4>
-                        <h5>12th Feb, 2017 at 05:56 pm</h5>
-                        <a class="reply_btn" href="#">Reply</a>
-                      </div>
-                    </div>
-                    <p>
-                      Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-                      sed do eiusmod tempor incididunt ut labore et dolore magna
-                      aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-                      ullamco laboris nisi ut aliquip ex ea commodo
-                    </p>
-                  </div>
-                  <div class="review_item">
-                    <div class="media">
-                      <div class="d-flex">
-                        <img
-                          src="img/product/single-product/review-3.png"
-                          alt=""
-                        />
-                      </div>
-                      <div class="media-body">
-                        <h4>Blake Ruiz</h4>
-                        <h5>12th Feb, 2017 at 05:56 pm</h5>
-                        <a class="reply_btn" href="#">Reply</a>
-                      </div>
-                    </div>
-                    <p>
-                      Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-                      sed do eiusmod tempor incididunt ut labore et dolore magna
-                      aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-                      ullamco laboris nisi ut aliquip ex ea commodo
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div class="col-lg-6">
-                <div class="review_box">
-                  <h4>Post a comment</h4>
-                  <form
-                    class="row contact_form"
-                    action="contact_process.php"
-                    method="post"
-                    id="contactForm"
-                    novalidate="novalidate"
-                  >
-                    <div class="col-md-12">
-                      <div class="form-group">
-                        <input
-                          type="text"
-                          class="form-control"
-                          id="name"
-                          name="name"
-                          placeholder="Your Full name"
-                        />
-                      </div>
-                    </div>
-                    <div class="col-md-12">
-                      <div class="form-group">
-                        <input
-                          type="email"
-                          class="form-control"
-                          id="email"
-                          name="email"
-                          placeholder="Email Address"
-                        />
-                      </div>
-                    </div>
-                    <div class="col-md-12">
-                      <div class="form-group">
-                        <input
-                          type="text"
-                          class="form-control"
-                          id="number"
-                          name="number"
-                          placeholder="Phone Number"
-                        />
-                      </div>
-                    </div>
-                    <div class="col-md-12">
-                      <div class="form-group">
-                        <textarea
-                          class="form-control"
-                          name="message"
-                          id="message"
-                          rows="1"
-                          placeholder="Message"
-                        ></textarea>
-                      </div>
-                    </div>
-                    <div class="col-md-12 text-right">
-                      <button
-                        type="submit"
-                        value="submit"
-                        class="btn submit_btn"
-                      >
-                        Submit Now
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div
-            class="tab-pane fade show active"
-            id="review"
-            role="tabpanel"
-            aria-labelledby="review-tab"
-          >
-            <div class="row">
-              <div class="col-lg-6">
-                <div class="row total_rate">
-                  <div class="col-6">
-                    <div class="box_total">
-                      <h5>Overall</h5>
-                      <h4>4.0</h4>
-                      <h6>(03 Reviews)</h6>
-                    </div>
-                  </div>
-                  <div class="col-6">
-                    <div class="rating_list">
-                      <h3>Based on 3 Reviews</h3>
-                      <ul class="list">
-                        <li>
-                          <a href="#"
-                            >5 Star
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i> 01</a
-                          >
-                        </li>
-                        <li>
-                          <a href="#"
-                            >4 Star
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i> 01</a
-                          >
-                        </li>
-                        <li>
-                          <a href="#"
-                            >3 Star
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i> 01</a
-                          >
-                        </li>
-                        <li>
-                          <a href="#"
-                            >2 Star
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i> 01</a
-                          >
-                        </li>
-                        <li>
-                          <a href="#"
-                            >1 Star
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i> 01</a
-                          >
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-                <div class="review_list">
-                  <div class="review_item">
-                    <div class="media">
-                      <div class="d-flex">
-                        <img
-                          src="img/product/single-product/review-1.png"
-                          alt=""
-                        />
-                      </div>
-                      <div class="media-body">
-                        <h4>Blake Ruiz</h4>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                      </div>
-                    </div>
-                    <p>
-                      Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-                      sed do eiusmod tempor incididunt ut labore et dolore magna
-                      aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-                      ullamco laboris nisi ut aliquip ex ea commodo
-                    </p>
-                  </div>
-                  <div class="review_item">
-                    <div class="media">
-                      <div class="d-flex">
-                        <img
-                          src="img/product/single-product/review-2.png"
-                          alt=""
-                        />
-                      </div>
-                      <div class="media-body">
-                        <h4>Blake Ruiz</h4>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                      </div>
-                    </div>
-                    <p>
-                      Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-                      sed do eiusmod tempor incididunt ut labore et dolore magna
-                      aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-                      ullamco laboris nisi ut aliquip ex ea commodo
-                    </p>
-                  </div>
-                  <div class="review_item">
-                    <div class="media">
-                      <div class="d-flex">
-                        <img
-                          src="img/product/single-product/review-3.png"
-                          alt=""
-                        />
-                      </div>
-                      <div class="media-body">
-                        <h4>Blake Ruiz</h4>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                      </div>
-                    </div>
-                    <p>
-                      Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-                      sed do eiusmod tempor incididunt ut labore et dolore magna
-                      aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-                      ullamco laboris nisi ut aliquip ex ea commodo
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div class="col-lg-6">
-                <div class="review_box">
-                  <h4>Add a Review</h4>
-                  <p>Your Rating:</p>
-                  <ul class="list">
-                    <li>
-                      <a href="#">
-                        <i class="fa fa-star"></i>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="#">
-                        <i class="fa fa-star"></i>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="#">
-                        <i class="fa fa-star"></i>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="#">
-                        <i class="fa fa-star"></i>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="#">
-                        <i class="fa fa-star"></i>
-                      </a>
-                    </li>
-                  </ul>
-                  <p>Outstanding</p>
-                  <form
-                    class="row contact_form"
-                    action="contact_process.php"
-                    method="post"
-                    id="contactForm"
-                    novalidate="novalidate"
-                  >
-                    <div class="col-md-12">
-                      <div class="form-group">
-                        <input
-                          type="text"
-                          class="form-control"
-                          id="name"
-                          name="name"
-                          placeholder="Your Full name"
-                        />
-                      </div>
-                    </div>
-                    <div class="col-md-12">
-                      <div class="form-group">
-                        <input
-                          type="email"
-                          class="form-control"
-                          id="email"
-                          name="email"
-                          placeholder="Email Address"
-                        />
-                      </div>
-                    </div>
-                    <div class="col-md-12">
-                      <div class="form-group">
-                        <input
-                          type="text"
-                          class="form-control"
-                          id="number"
-                          name="number"
-                          placeholder="Phone Number"
-                        />
-                      </div>
-                    </div>
-                    <div class="col-md-12">
-                      <div class="form-group">
-                        <textarea
-                          class="form-control"
-                          name="message"
-                          id="message"
-                          rows="1"
-                          placeholder="Review"
-                        ></textarea>
-                      </div>
-                    </div>
-                    <div class="col-md-12 text-right">
-                      <button
-                        type="submit"
-                        value="submit"
-                        class="btn submit_btn"
-                      >
-                        Submit Now
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section> --}}
-    <!--================End Product Description Area =================-->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 
-    @include('home.footer')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var addToWishlistForms = document.querySelectorAll('.add-to-wishlist-form');
+
+        addToWishlistForms.forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                event.preventDefault(); // Prevent form submission
+
+                var heartIcon = this.querySelector('.heart-icon');
+                var productId = this.getAttribute('data-product-id');
+
+                if (!heartIcon.classList.contains('heart-red')) {
+                    heartIcon.classList.add('heart-red'); // Add the red color class
+                } else {
+                    heartIcon.classList.remove('heart-red'); // Remove the red color class
+                }
+
+                // Submit the form
+                var formData = new FormData(this);
+                fetch(this.action, {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json();
+                        }
+                        throw new Error('Network response was not ok.');
+                    })
+                    .then(data => {
+                        // Handle success response
+                        console.log(data);
+
+                        // Update the wishlist in the session
+                        fetch('/update-wishlist', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                },
+                                body: JSON.stringify({
+                                    productId: productId,
+                                    action: heartIcon.classList.contains('heart-red') ? 'add' : 'remove'
+                                })
+                            })
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error('Failed to update wishlist.');
+                                }
+                                return response.json();
+                            })
+                            .then(data => {
+                                console.log(data);
+                            })
+                            .catch(error => {
+                                console.error('Error occurred while updating wishlist:', error);
+                            });
+
+                    })
+                    .catch(error => {
+                        console.error('Error occurred:', error);
+                    });
+            });
+        });
+
+        // Star rating functionality
+        const stars = document.querySelectorAll('.star-rating .fa');
+        const ratingInput = document.querySelector('input[name="rating"]');
+
+        stars.forEach((star, index) => {
+            star.addEventListener('click', () => {
+                // Set the rating value to the clicked star's index + 1
+                ratingInput.value = index + 1;
+
+                // Highlight all the stars up to the clicked star
+                highlightStars(index + 1);
+            });
+
+            star.addEventListener('mouseover', () => {
+                // Highlight all the stars up to the hovered star
+                highlightStars(index + 1);
+            });
+
+            star.addEventListener('mouseout', () => {
+                // Highlight stars based on the current rating value
+                highlightStars(ratingInput.value);
+            });
+        });
+
+        function highlightStars(rating) {
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.add('checked');
+                } else {
+                    star.classList.remove('checked');
+                }
+            });
+        }
+
+        //
+        highlightStars(ratingInput.value);
+    });
+
+</script>
+
+
+
+@include('home.footer')
